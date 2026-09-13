@@ -1,0 +1,43 @@
+name: g10-pj
+
+services:
+  backend:
+    container_name: g10-pj-backend
+    build:
+      context: .
+      target: build
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rental
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+    volumes:
+      - .:/app
+      - maven-cache:/root/.m2
+    working_dir: /app
+    command: ./mvnw spring-boot:run
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    container_name: g10-pj-postgres
+    image: postgres:17
+    environment:
+      POSTGRES_DB: rental
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rental"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  maven-cache:
