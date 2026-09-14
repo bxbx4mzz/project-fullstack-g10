@@ -12,6 +12,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rental
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
+
+      # GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      # GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     volumes:
       - .:/app
       - maven-cache:/root/.m2
