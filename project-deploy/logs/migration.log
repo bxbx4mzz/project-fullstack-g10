@@ -1,0 +1,103 @@
+Normally, the logs directory is created by docker-compose when the containers are started. 
+However, this can lead to permission issues with mounted volumes, as the owner of the logs directory will be root. 
+To avoid this, we create the logs directory and the migration file beforehand, so that the owner is the current user.[2026-07-31 11:33:07] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 11:33:07] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 11:33:07] Using 'postgres' driver for database querying
+[2026-07-31 11:33:08] [⣷] applying migrations...[2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 11:33:49] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 11:33:49] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 11:33:50] Using 'postgres' driver for database querying
+[2026-07-31 11:33:50] [⣷] applying migrations...[2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 11:42:25] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 11:42:25] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 11:42:26] Using 'postgres' driver for database querying
+[2026-07-31 11:42:27] [⣷] applying migrations...[2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 11:59:54] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 11:59:54] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 11:59:55] Using 'postgres' driver for database querying
+[2026-07-31 11:59:55] [⣷] applying migrations...{
+[2026-07-31 11:59:55]   severity_local: 'NOTICE',
+[2026-07-31 11:59:55]   severity: 'NOTICE',
+[2026-07-31 11:59:55]   code: '42P06',
+[2026-07-31 11:59:55]   message: 'schema "drizzle" already exists, skipping',
+[2026-07-31 11:59:55]   file: 'schemacmds.c',
+[2026-07-31 11:59:55]   line: '132',
+[2026-07-31 11:59:55]   routine: 'CreateSchemaCommand'
+[2026-07-31 11:59:55] }
+[2026-07-31 11:59:55] [2K[1G[✓] migrations applied successfully!
+[2026-07-31 14:06:33] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 14:06:33] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 14:06:34] Using 'postgres' driver for database querying
+[2026-07-31 14:09:50] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 14:09:50] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 14:09:51] Using 'postgres' driver for database querying
+[2026-07-31 14:09:51] [⣷] applying migrations...[2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 14:18:12] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 14:18:12] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 14:18:13] Using 'postgres' driver for database querying
+[2026-07-31 14:18:13] [⣷] applying migrations...[2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 14:28:32] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 14:28:32] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 14:28:33] Using 'postgres' driver for database querying
+[2026-07-31 14:28:33] [⣷] applying migrations...{
+[2026-07-31 14:28:33]   severity_local: 'NOTICE',
+[2026-07-31 14:28:33]   severity: 'NOTICE',
+[2026-07-31 14:28:33]   code: '42P06',
+[2026-07-31 14:28:33]   message: 'schema "drizzle" already exists, skipping',
+[2026-07-31 14:28:33]   file: 'schemacmds.c',
+[2026-07-31 14:28:33]   line: '132',
+[2026-07-31 14:28:33]   routine: 'CreateSchemaCommand'
+[2026-07-31 14:28:33] }
+[2026-07-31 14:28:33] [2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 14:46:16] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 14:46:16] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 14:46:16] Using 'postgres' driver for database querying
+[2026-07-31 14:46:17] [⣷] applying migrations...{
+[2026-07-31 14:46:17]   severity_local: 'NOTICE',
+[2026-07-31 14:46:17]   severity: 'NOTICE',
+[2026-07-31 14:46:17]   code: '42P06',
+[2026-07-31 14:46:17]   message: 'schema "drizzle" already exists, skipping',
+[2026-07-31 14:46:17]   file: 'schemacmds.c',
+[2026-07-31 14:46:17]   line: '132',
+[2026-07-31 14:46:17]   routine: 'CreateSchemaCommand'
+[2026-07-31 14:46:17] }
+[2026-07-31 14:46:17] [2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 15:01:38] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 15:01:38] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 15:01:38] Using 'postgres' driver for database querying
+[2026-07-31 15:01:38] [⣷] applying migrations...{
+[2026-07-31 15:01:38]   severity_local: 'NOTICE',
+[2026-07-31 15:01:38]   severity: 'NOTICE',
+[2026-07-31 15:01:38]   code: '42P06',
+[2026-07-31 15:01:38]   message: 'schema "drizzle" already exists, skipping',
+[2026-07-31 15:01:38]   file: 'schemacmds.c',
+[2026-07-31 15:01:38]   line: '132',
+[2026-07-31 15:01:38]   routine: 'CreateSchemaCommand'
+[2026-07-31 15:01:38] }
+[2026-07-31 15:01:38] [2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 15:09:59] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 15:09:59] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 15:10:00] Using 'postgres' driver for database querying
+[2026-07-31 15:10:00] [⣷] applying migrations...{
+[2026-07-31 15:10:00]   severity_local: 'NOTICE',
+[2026-07-31 15:10:00]   severity: 'NOTICE',
+[2026-07-31 15:10:00]   code: '42P06',
+[2026-07-31 15:10:00]   message: 'schema "drizzle" already exists, skipping',
+[2026-07-31 15:10:00]   file: 'schemacmds.c',
+[2026-07-31 15:10:00]   line: '132',
+[2026-07-31 15:10:00]   routine: 'CreateSchemaCommand'
+[2026-07-31 15:10:00] }
+[2026-07-31 15:10:00] [2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.
+[2026-07-31 15:17:01] No config path provided, using default 'drizzle.config.ts'
+[2026-07-31 15:17:01] Reading config file '/app/drizzle.config.ts'
+[2026-07-31 15:17:02] Using 'postgres' driver for database querying
+[2026-07-31 15:17:02] [⣷] applying migrations...{
+[2026-07-31 15:17:02]   severity_local: 'NOTICE',
+[2026-07-31 15:17:02]   severity: 'NOTICE',
+[2026-07-31 15:17:02]   code: '42P06',
+[2026-07-31 15:17:02]   message: 'schema "drizzle" already exists, skipping',
+[2026-07-31 15:17:02]   file: 'schemacmds.c',
+[2026-07-31 15:17:02]   line: '132',
+[2026-07-31 15:17:02]   routine: 'CreateSchemaCommand'
+[2026-07-31 15:17:02] }
+[2026-07-31 15:17:02] [2K[1G[⣷] applying migrations...[ELIFECYCLE] Command failed with exit code 1.

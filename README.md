@@ -1,1 +1,0 @@
-# project-fullstack-g10

@@ -1,0 +1,14 @@
+name: preflight-project-g10 # You can also change this to another name to avoid warning with existing group.
+services:
+  frontend:
+    container_name: pf-frontend
+    build: .
+    ports:
+      - ${NGINX_PORT}:6000
+    networks:
+      - preflight_pf-net
+    environment:
+      - NGINX_PROXY=${NGINX_PROXY}
+networks:
+  preflight_pf-net: # Check by using `docker network ls` command
+    external: true
