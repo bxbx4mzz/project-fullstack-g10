@@ -13,7 +13,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        format_sql: true
+         '[format_sql]': true
 
   security:
     oauth2:
@@ -44,4 +44,4 @@ app:
 
 logging:
   level:
-    org.springframework.security: INFO
+    '[org.springframework.security]': INFO
