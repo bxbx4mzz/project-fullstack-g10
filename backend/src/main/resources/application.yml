@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: rental-backend
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/rental}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope:
+              - openid
+              - profile
+              - email
+
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        name: RENTAL_SESSION
+        http-only: true
+        same-site: lax
+
+app:
+  # URL ของ frontend ที่ backend จะ redirect กลับไปหลัง login/logout สำเร็จ
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  # รายชื่ออีเมลที่ whitelist ไว้ล่วงหน้าให้เป็น STAFF / ADMIN (คั่นด้วย comma)
+  admin-emails: ${ADMIN_EMAILS:}
+  staff-emails: ${STAFF_EMAILS:}
+
+logging:
+  level:
+    org.springframework.security: INFO

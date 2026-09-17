@@ -1,0 +1,36 @@
+server {
+    listen 6000;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Reverse proxy ไปยัง backend เพื่อให้ frontend + backend อยู่ origin เดียวกัน
+    # (จำเป็นสำหรับ session cookie ที่ใช้ยืนยันตัวตน)
+    location /api/ {
+        proxy_pass ${NGINX_PROXY};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /oauth2/ {
+        proxy_pass ${NGINX_PROXY};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /login/ {
+        proxy_pass ${NGINX_PROXY};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
