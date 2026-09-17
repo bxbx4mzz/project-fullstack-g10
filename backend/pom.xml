@@ -19,6 +19,10 @@
 
     <properties>
         <java.version>21</java.version>
+        <!-- Spring Boot 3.3.4's default Lombok predates JDK 24, so annotation
+             processing silently produces no getters/setters/builder on newer
+             JDKs. Pin a Lombok release that supports the running JDK. -->
+        <lombok.version>1.18.42</lombok.version>
     </properties>
 
     <dependencies>
@@ -86,6 +90,23 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Without this, Maven relies on implicit annotation-processor discovery
+                         from the compile classpath, which silently fails to pick up Lombok
+                         in this environment (getters/setters/builder don't get generated).
+                         Declaring it explicitly here forces it to run. -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

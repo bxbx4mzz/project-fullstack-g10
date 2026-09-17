@@ -27,6 +27,13 @@
 set BASE_DIR=%~dp0
 set WRAPPER_JAR="%BASE_DIR%.mvn\wrapper\maven-wrapper.jar"
 set WRAPPER_PROPERTIES="%BASE_DIR%.mvn\wrapper\maven-wrapper.properties"
+
+@REM Strip the trailing backslash from BASE_DIR before it's used inside a
+@REM quoted -D argument below: an odd number of backslashes right before a
+@REM closing quote is parsed by Windows as an escaped quote (not a string
+@REM terminator), which silently merges the following arguments into one.
+set PROJECT_DIR=%BASE_DIR%
+if "%PROJECT_DIR:~-1%"=="\" set PROJECT_DIR=%PROJECT_DIR:~0,-1%
 set WRAPPER_URL=https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar
 
 if not exist %WRAPPER_JAR% (
@@ -46,6 +53,6 @@ if not "%JAVA_HOME%"=="" (
     set JAVACMD=java.exe
 )
 
-%JAVACMD% -classpath %WRAPPER_JAR% "-Dmaven.multiModuleProjectDirectory=%BASE_DIR%" org.apache.maven.wrapper.MavenWrapperMain %*
+%JAVACMD% -classpath %WRAPPER_JAR% "-Dmaven.multiModuleProjectDirectory=%PROJECT_DIR%" org.apache.maven.wrapper.MavenWrapperMain %*
 
 @endlocal

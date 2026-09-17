@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.http.HttpStatus;
@@ -24,15 +25,18 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final ClientRegistrationRepository clientRegistrationRepository;
     private final String frontendUrl;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
                            OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
                            OAuth2LoginFailureHandler oAuth2LoginFailureHandler,
+                           ClientRegistrationRepository clientRegistrationRepository,
                            @Value("${app.frontend-url}") String frontendUrl) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
         this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
+        this.clientRegistrationRepository = clientRegistrationRepository;
         this.frontendUrl = frontendUrl;
     }
 
@@ -52,6 +56,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestResolver(new CustomAuthorizationRequestResolver(
+                                        clientRegistrationRepository, "/oauth2/authorization")))
                         .userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
