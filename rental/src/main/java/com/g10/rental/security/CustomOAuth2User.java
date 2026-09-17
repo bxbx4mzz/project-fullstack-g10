@@ -1,6 +1,6 @@
 package com.g10.rental.security;
 
-import com.g10.rental.model.User;
+import com.g10.rental.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
@@ -11,21 +11,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Wraps our own {@link User} entity so downstream code (controllers,
- * @PreAuthorize checks) can access app-specific fields (id, role, ...)
- * instead of raw Google attributes. Google's registration requests the
- * "openid" scope, so Spring Security authenticates via the OIDC path -
- * this must implement OidcUser (not just OAuth2User) or @AuthenticationPrincipal
- * injection silently fails and every request looks unauthenticated.
- */
 public class CustomOAuth2User implements OidcUser {
 
     private final User user;
     private final OidcUser oidcUser;
 
-    public CustomOAuth2User(User user, OidcUser oidcUser) {
-        this.user = user;
+    public CustomOAuth2User(com.g10.rental.entity.User user2, OidcUser oidcUser) {
+        this.user = user2;
         this.oidcUser = oidcUser;
     }
 

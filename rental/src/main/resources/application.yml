@@ -26,6 +26,7 @@ spring:
               - openid
               - profile
               - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 
 server:
   port: 8080
@@ -37,9 +38,7 @@ server:
         same-site: lax
 
 app:
-  # URL ของ frontend ที่ backend จะ redirect กลับไปหลัง login/logout สำเร็จ
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
-  # รายชื่ออีเมลที่ whitelist ไว้ล่วงหน้าให้เป็น STAFF / ADMIN (คั่นด้วย comma)
   admin-emails: ${ADMIN_EMAILS:}
   staff-emails: ${STAFF_EMAILS:}
 

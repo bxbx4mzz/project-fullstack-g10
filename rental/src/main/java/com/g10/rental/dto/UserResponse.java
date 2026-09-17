@@ -1,7 +1,7 @@
-package com.g10.rental.web.dto;
+package com.g10.rental.dto;
 
-import com.g10.rental.model.Role;
-import com.g10.rental.model.User;
+import com.g10.rental.entity.Role;
+import com.g10.rental.entity.User;
 
 public record UserResponse(
         Long id,

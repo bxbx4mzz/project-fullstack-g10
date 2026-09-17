@@ -1,32 +1,50 @@
-# --- OS ---
+# OS
 .DS_Store
 Thumbs.db
 
-# --- IDE ---
+# IDE
 .idea/
 .vscode/
 *.iml
+*.iws
+*.ipr
 
-# --- Backend (Maven / Java) ---
-backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
+# Java / Maven
+target/
 *.class
 *.log
 
-# --- Frontend (Node / Vite) ---
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
-frontend/pnpm-debug.log*
-frontend/*.tsbuildinfo
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
 
-# --- Env files (never commit secrets) ---
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+.pnpm-debug.log*
+*.tsbuildinfo
+
+# Environment / Secrets
 .env
 .env.*
 !.env.example
-backend/.env
-backend/.env.*
-!backend/.env.example
-frontend/.env
-frontend/.env.*
-!frontend/.env.example
+
+# Spring / IDE
+HELP.md
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Gradle / Build
+build/
