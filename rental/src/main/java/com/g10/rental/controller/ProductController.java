@@ -7,6 +7,7 @@ import com.g10.rental.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
+    @PreAuthorize ("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
     public List<ProductResponse> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize ("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
     public ProductResponse getProductById(
             @PathVariable Long id
     ) {
@@ -31,6 +34,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize ("hasAnyRole('STAFF', 'ADMIN')")
     public ProductResponse createProduct(
             @RequestBody CreateProductRequest request
     ) {
@@ -38,6 +42,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize ("hasAnyRole('STAFF', 'ADMIN')")
     public ProductResponse updateProduct(
             @PathVariable Long id,
             @RequestBody UpdateProductRequest request
@@ -46,6 +51,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize ("hasAnyRole('STAFF', 'ADMIN')")
     public void deleteProduct(
             @PathVariable Long id
     ) {
