@@ -1,5 +1,6 @@
 package com.g10.rental.config;
 
+import com.g10.rental.security.CustomAuthorizationRequestResolver;
 import com.g10.rental.security.OAuth2LoginFailureHandler;
 import com.g10.rental.security.OAuth2LoginSuccessHandler;
 import com.g10.rental.service.CustomOAuth2UserService;
@@ -13,11 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 
 @Configuration
 @EnableMethodSecurity
@@ -26,17 +29,20 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final ClientRegistrationRepository clientRegistrationRepository;
     private final String frontendUrl;
 
     public SecurityConfig(
             CustomOAuth2UserService customOAuth2UserService,
             OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
             OAuth2LoginFailureHandler oAuth2LoginFailureHandler,
+            ClientRegistrationRepository clientRegistrationRepository,
             @Value("${app.frontend-url}") String frontendUrl
     ) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
         this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
+        this.clientRegistrationRepository = clientRegistrationRepository;
         this.frontendUrl = frontendUrl;
     }
 
@@ -105,6 +111,11 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfo ->
                     userInfo.oidcUserService(
                         customOAuth2UserService
+                    )
+                )
+                .authorizationEndpoint(authorization -> authorization
+                    .authorizationRequestResolver(new CustomAuthorizationRequestResolver(
+                            clientRegistrationRepository, "/oauth2/authorization")
                     )
                 )
                 .successHandler(
