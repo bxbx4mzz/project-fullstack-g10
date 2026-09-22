@@ -7,6 +7,9 @@ Thumbs.db
 .vscode/
 *.iml
 
+# --- Claude Code (personal settings, keep launch.json shared) ---
+.claude/settings.local.json
+
 # --- Backend (Maven / Java) ---
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
