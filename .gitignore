@@ -7,8 +7,8 @@ Thumbs.db
 .vscode/
 *.iml
 
-# --- Claude Code (personal settings, keep launch.json shared) ---
-.claude/settings.local.json
+# --- Claude Code (local tool config, not shared via git) ---
+.claude/
 
 # --- Backend (Maven / Java) ---
 backend/target/
