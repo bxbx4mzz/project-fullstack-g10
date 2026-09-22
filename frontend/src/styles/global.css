@@ -1,14 +1,14 @@
 :root {
-  --bg: #f5f3f0;
+  --bg: #f1ebdd;
   --surface: #ffffff;
-  --text: #1f2937;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --primary: #4f46e5;
+  --text: #3f3a34;
+  --text-muted: #948b7d;
+  --border: #ece3d3;
+  --primary: #cda15a;
   --primary-text: #ffffff;
-  --danger: #dc2626;
-  --badge-bg: #eef2ff;
-  --badge-text: #4338ca;
+  --danger: #d9534f;
+  --badge-bg: #f6e9cf;
+  --badge-text: #b5863f;
 }
 
 [data-theme='dark'] {
@@ -30,7 +30,7 @@
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -88,8 +88,15 @@ body {
 
 .login-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 420px;
   text-align: center;
+}
+
+.login-card h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  white-space: nowrap;
+  margin: 0;
 }
 
 .subtitle {

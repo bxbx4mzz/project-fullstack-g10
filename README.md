@@ -31,7 +31,7 @@ backend/    Spring Boot + Spring Security (OAuth2/OIDC) + PostgreSQL
   → Google redirect กลับ /login/oauth2/code/google (backend)
   → CustomOAuth2UserService upsert user ลง DB + ตั้ง session cookie
   → redirect ไป {frontend}/oauth2/redirect
-  → frontend เรียก GET /api/auth/me → ได้ user → เข้า /dashboard
+  → frontend เรียก GET /api/auth/me → ได้ user → เข้า /shop
 ```
 
 ## การกำหนด role
