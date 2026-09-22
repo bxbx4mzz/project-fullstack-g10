@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
-import { googleLoginUrl } from '../lib/api'
+import { googleLoginUrl, homePathForRole } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import { ThemeToggle } from '../components/ThemeToggle'
 
@@ -10,29 +10,28 @@ export function LoginPage() {
   const error = searchParams.get('error')
 
   useEffect(() => {
-    document.title = 'เข้าสู่ระบบ - ร้านเช่าเสื้อผ้า'
+    document.title = 'Sign in - Clothing Rental Shop'
   }, [])
 
   if (loading) {
-    return <div className="page-center">กำลังโหลด...</div>
+    return <div className="page-center">Loading...</div>
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={homePathForRole(user.role)} replace />
   }
 
   return (
     <div className="page-center">
       <ThemeToggle />
       <div className="card login-card">
-        <h1>ร้านเช่าเสื้อผ้า</h1>
-        <p className="subtitle">เข้าสู่ระบบสำหรับเจ้าของร้านและพนักงาน</p>
+        <h1>Clothing Rental Shop</h1>
 
-        {error && <p className="error-text">เข้าสู่ระบบไม่สำเร็จ: {decodeURIComponent(error)}</p>}
+        {error && <p className="error-text">Sign-in failed: {decodeURIComponent(error)}</p>}
 
         <a className="google-btn" href={googleLoginUrl}>
           <GoogleIcon />
-          เข้าสู่ระบบด้วย Google
+          Sign in with Google
         </a>
       </div>
     </div>
