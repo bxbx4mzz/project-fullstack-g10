@@ -1,6 +1,6 @@
 package com.g10.rental.controller;
 
-import com.g10.rental.dto.UserResponse;
+import com.g10.rental.dto.user.UserResponse;
 import com.g10.rental.security.CustomOAuth2User;
 
 import org.springframework.http.ResponseEntity;
