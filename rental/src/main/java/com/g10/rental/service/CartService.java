@@ -141,9 +141,9 @@ public class CartService {
      * Remove one item from current user's cart.
      */
     public CartResponse removeItem(
-            Authentication authentication,
-            Long itemId
-    ) {
+        Authentication authentication,
+        Long itemId
+        ) {     
 
         User user = getCurrentUser(authentication);
 
@@ -159,9 +159,12 @@ public class CartService {
                 );
 
         cartItemRepository.delete(cartItem);
+        cartItemRepository.flush();
+
+        cart.getItems().remove(cartItem);
 
         return toCartResponse(cart);
-    }
+        }
 
     /**
      * Clear current user's cart.
