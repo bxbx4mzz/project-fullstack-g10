@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "carts")
@@ -22,6 +23,10 @@ public class Cart {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+
+    private LocalDate rentDate;
+
+    private LocalDate returnDate;
 
     @Builder.Default
     @OneToMany(

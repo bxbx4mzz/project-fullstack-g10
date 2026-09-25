@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class AddCartItemRequest {
     @NotNull
-    private Long productId;
+    private Long variantId;
 
     @NotNull
     @Min(1)

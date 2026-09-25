@@ -7,10 +7,12 @@ import com.g10.rental.dto.cart.UpdateCartItemRequest;
 import com.g10.rental.entity.Cart;
 import com.g10.rental.entity.CartItem;
 import com.g10.rental.entity.Product;
+import com.g10.rental.entity.ProductVariant;
 import com.g10.rental.entity.User;
 import com.g10.rental.repository.CartItemRepository;
 import com.g10.rental.repository.CartRepository;
 import com.g10.rental.repository.ProductRepository;
+import com.g10.rental.repository.ProductVariantRepository;
 import com.g10.rental.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
 
     /**
@@ -49,7 +52,7 @@ public class CartService {
     }
 
     /**
-     * Add product to current user's cart.
+     * Add variant to current user's cart.
      */
     public CartResponse addItem(
             Authentication authentication,
@@ -58,30 +61,31 @@ public class CartService {
 
         User user = getCurrentUser(authentication);
 
-        Product product = productRepository.findById(request.getProductId())
+        ProductVariant variant = productVariantRepository
+                .findById(request.getVariantId())
                 .orElseThrow(() ->
-                        new RuntimeException("Product not found")
+                        new RuntimeException("Product variant not found")
                 );
 
-        if (request.getQuantity() > product.getStock()) {
-            throw new RuntimeException("Not enough product stock");
+        if (request.getQuantity() > variant.getStockQty()) {
+            throw new RuntimeException("Not enough variant stock");
         }
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseGet(() -> createCart(user));
 
         CartItem cartItem = cartItemRepository
-            .findByCartIdAndProductId(
-                    cart.getId(),
-                    product.getId()
-            )
-            .orElse(null);
+                .findByCartIdAndVariantId(
+                        cart.getId(),
+                        variant.getId()
+                )
+                .orElse(null);
 
         if (cartItem == null) {
 
             cartItem = CartItem.builder()
                     .cart(cart)
-                    .product(product)
+                    .variant(variant)
                     .quantity(request.getQuantity())
                     .build();
 
@@ -90,8 +94,8 @@ public class CartService {
             int newQuantity =
                     cartItem.getQuantity() + request.getQuantity();
 
-            if (newQuantity > product.getStock()) {
-                throw new RuntimeException("Not enough product stock");
+            if (newQuantity > variant.getStockQty()) {
+                throw new RuntimeException("Not enough variant stock");
             }
 
             cartItem.setQuantity(newQuantity);
@@ -124,10 +128,10 @@ public class CartService {
                         new RuntimeException("Cart item not found")
                 );
 
-        Product product = cartItem.getProduct();
+        ProductVariant variant = cartItem.getVariant();
 
-        if (request.getQuantity() > product.getStock()) {
-            throw new RuntimeException("Not enough product stock");
+        if (request.getQuantity() > variant.getStockQty()) {
+            throw new RuntimeException("Not enough variant stock");
         }
 
         cartItem.setQuantity(request.getQuantity());
@@ -141,9 +145,9 @@ public class CartService {
      * Remove one item from current user's cart.
      */
     public CartResponse removeItem(
-        Authentication authentication,
-        Long itemId
-        ) {     
+            Authentication authentication,
+            Long itemId
+    ) {
 
         User user = getCurrentUser(authentication);
 
@@ -164,7 +168,7 @@ public class CartService {
         cart.getItems().remove(cartItem);
 
         return toCartResponse(cart);
-        }
+    }
 
     /**
      * Clear current user's cart.
@@ -225,6 +229,8 @@ public class CartService {
 
         return CartResponse.builder()
                 .id(cart.getId())
+                .rentDate(cart.getRentDate())
+                .returnDate(cart.getReturnDate())
                 .items(items)
                 .total(total)
                 .build();
@@ -234,22 +240,35 @@ public class CartService {
             CartItem item
     ) {
 
-        Product product = item.getProduct();
+        ProductVariant variant = item.getVariant();
+
+        Product product = productRepository
+                .findById(variant.getProductId())
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found")
+                );
+
+        /*
+         * use 3 day short-term rental price for display in Cart
+         * cuz didn't set rental duration
+         * when Checkout calculate new price based on rentDate/returnDate
+         */
+        BigDecimal price = variant.getPrice3Day();
 
         BigDecimal subtotal =
-                product.getPrice()
-                        .multiply(
-                                BigDecimal.valueOf(
-                                        item.getQuantity()
-                                )
-                        );
+                price.multiply(
+                        BigDecimal.valueOf(item.getQuantity())
+                );
 
         return CartItemResponse.builder()
                 .id(item.getId())
                 .productId(product.getId())
+                .variantId(variant.getId())
                 .productName(product.getName())
                 .imageUrl(product.getImageUrl())
-                .price(product.getPrice())
+                .size(variant.getSize())
+                .color(variant.getColor())
+                .price(price)
                 .quantity(item.getQuantity())
                 .subtotal(subtotal)
                 .build();

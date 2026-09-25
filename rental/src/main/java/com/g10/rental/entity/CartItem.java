@@ -13,7 +13,7 @@ import lombok.*;
         // Ensure that each product can only appear once in a cart
         @UniqueConstraint(
             name = "uk_cart_product",
-            columnNames = {"cart_id", "product_id"}
+            columnNames = {"cart_id", "variant_id"}
         )
     }
 )
@@ -32,8 +32,8 @@ public class CartItem {
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "variant_id", nullable = false)
+    private ProductVariant variant;
 
     @Column(nullable = false)
     private Integer quantity;
