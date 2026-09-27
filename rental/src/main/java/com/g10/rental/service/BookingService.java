@@ -131,9 +131,26 @@ public class BookingService {
         BigDecimal discount = BigDecimal.ZERO;
 
         booking.setDiscount(discount);
+        booking.setFinalPrice(totalPrice.subtract(discount)
 
-        booking.setFinalPrice(
-                totalPrice.subtract(discount)
+        // // if have discounnt
+        // BigDecimal discount = totalPrice
+        // .multiply(new BigDecimal("0.10"));
+
+        // BigDecimal finalPrice =
+        // totalPrice.subtract(discount);
+
+        // // ซื้อ 2 ชิ้นขึ้นไป ลด 25%
+        // int totalQuantity = cart.getItems().stream()
+        //         .mapToInt(CartItem::getQuantity)
+        //         .sum();
+
+        // if (totalQuantity >= 2) {
+        //     discount = totalPrice.multiply(new BigDecimal("0.25"));
+        // }
+
+        // booking.setDiscount(discount);
+        // booking.setFinalPrice(totalPrice.subtract(discount));
         );
 
         Booking savedBooking =
