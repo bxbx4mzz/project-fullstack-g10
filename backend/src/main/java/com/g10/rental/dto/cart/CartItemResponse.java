@@ -1,0 +1,22 @@
+package com.g10.rental.dto.cart;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+
+/** Ported from branch backemd-customer (dto/cart/CartItemResponse.java). */
+@Getter
+@Builder
+public class CartItemResponse {
+    private Long id;
+    private Long variantId;
+    private Long productId;
+    private String productName;
+    private String imageUrl;
+    private String size;
+    private String color;
+    private BigDecimal price;
+    private Integer quantity;
+    private BigDecimal subtotal;
+}

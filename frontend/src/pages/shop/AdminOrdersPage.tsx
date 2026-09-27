@@ -1,19 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FxLayout, type FxNavItem } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
+import { fetchStaffBookings, updateBookingStatus, type ApiBooking, type BookingStatus } from '../../lib/api'
 
-type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'RETURNED' | 'CANCELLED'
-
-type Order = {
-  id: string
-  customer: string
-  items: string
-  dueDate: string
-  shippingMethod: string
-  status: OrderStatus
-}
-
-const STATUS_LABEL: Record<OrderStatus, string> = {
+const STATUS_LABEL: Record<BookingStatus, string> = {
   PENDING: 'Pending',
   CONFIRMED: 'Confirmed',
   SHIPPED: 'Shipped',
@@ -21,47 +11,21 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   CANCELLED: 'Cancelled',
 }
 
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: 'B0007',
-    customer: 'คุณมานี ใจดี',
-    items: 'Elsa dress (สีดำ), Muse fur jacket (สีน้ำตาล)',
-    dueDate: '24 ก.ค. 2569',
-    shippingMethod: 'EMS',
-    status: 'CONFIRMED',
-  },
-  {
-    id: 'B0008',
-    customer: 'คุณสมชาย ใจดี',
-    items: 'ชุดราตรีสีดำ',
-    dueDate: '28 ก.ย. 2569',
-    shippingMethod: 'Messenger',
-    status: 'PENDING',
-  },
-  {
-    id: 'B0009',
-    customer: 'คุณวิภา รักเรียน',
-    items: 'ทักซิโด้',
-    dueDate: '30 ก.ย. 2569',
-    shippingMethod: 'รับที่ร้าน',
-    status: 'SHIPPED',
-  },
-]
-
-const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
+const NEXT_STATUS: Partial<Record<BookingStatus, BookingStatus>> = {
   PENDING: 'CONFIRMED',
   CONFIRMED: 'SHIPPED',
   SHIPPED: 'RETURNED',
 }
 
-const NEXT_ACTION_LABEL: Partial<Record<OrderStatus, string>> = {
+const NEXT_ACTION_LABEL: Partial<Record<BookingStatus, string>> = {
   PENDING: 'Confirm order',
   CONFIRMED: 'Mark as shipped',
   SHIPPED: 'Mark as returned',
 }
 
-function buildCustomerMessage(order: Order): string {
-  return `สวัสดีค่ะ${order.customer} 🎉\nชุดที่คุณเช่า (${order.items}) ถูกจัดส่งแล้วทาง ${order.shippingMethod} ค่ะ\nกรุณาส่งคืนภายในวันที่ ${order.dueDate} นะคะ ขอบคุณที่ใช้บริการค่ะ 🙏`
+function buildCustomerMessage(booking: ApiBooking): string {
+  const itemsSummary = booking.items.map((i) => `variant #${i.variantId} x${i.qty}`).join(', ')
+  return `สวัสดีค่ะคุณ${booking.customerName} 🎉\nชุดที่คุณเช่า (${itemsSummary}) ถูกจัดส่งแล้วทาง ${booking.shippingMethod} ค่ะ\nกรุณาส่งคืนภายในวันที่ ${booking.returnDate} นะคะ ขอบคุณที่ใช้บริการค่ะ 🙏`
 }
 
 type AdminOrdersPageProps = {
@@ -70,29 +34,53 @@ type AdminOrdersPageProps = {
 }
 
 export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navItems = adminNavItems }: AdminOrdersPageProps) {
-  const [orders, setOrders] = useState(INITIAL_ORDERS)
-  const [messageForId, setMessageForId] = useState<string | null>(null)
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [orders, setOrders] = useState<ApiBooking[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [messageForId, setMessageForId] = useState<number | null>(null)
+  const [copiedId, setCopiedId] = useState<number | null>(null)
+  const [busyId, setBusyId] = useState<number | null>(null)
 
-  function advanceStatus(id: string) {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== id) return o
-        const next = NEXT_STATUS[o.status]
-        return next ? { ...o, status: next } : o
-      }),
-    )
-    const order = orders.find((o) => o.id === id)
-    if (order && order.status === 'CONFIRMED') {
-      setMessageForId(id)
+  async function load() {
+    try {
+      setOrders(await fetchStaffBookings())
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'โหลดรายการจองไม่สำเร็จ')
     }
   }
 
-  function cancelOrder(id: string) {
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'CANCELLED' } : o)))
+  useEffect(() => {
+    load()
+  }, [])
+
+  async function advanceStatus(order: ApiBooking) {
+    const next = NEXT_STATUS[order.status]
+    if (!next) return
+    setBusyId(order.id)
+    try {
+      await updateBookingStatus(order.id, next)
+      if (order.status === 'CONFIRMED') setMessageForId(order.id)
+      await load()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'เปลี่ยนสถานะไม่สำเร็จ')
+    } finally {
+      setBusyId(null)
+    }
   }
 
-  async function copyMessage(order: Order) {
+  async function cancelOrder(id: number) {
+    setBusyId(id)
+    try {
+      await updateBookingStatus(id, 'CANCELLED')
+      await load()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'ยกเลิกไม่สำเร็จ')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function copyMessage(order: ApiBooking) {
     try {
       await navigator.clipboard.writeText(buildCustomerMessage(order))
       setCopiedId(order.id)
@@ -107,50 +95,67 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
       <h1>Orders</h1>
       <p className="fx-page-subtitle">ติดตามสถานะการจอง และแจ้งลูกค้าเมื่อจัดส่งชุดแล้ว</p>
 
-      {orders.map((order) => (
-        <div className="fx-card" key={order.id} style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-            <div>
-              <p className="fx-product-name" style={{ margin: 0 }}>
-                {order.id} • {order.customer}
-              </p>
-              <span className="fx-page-subtitle">
-                {order.items} • ส่ง{order.shippingMethod} • กำหนดคืน {order.dueDate}
-              </span>
-            </div>
-            <span className="fx-user-badge">{STATUS_LABEL[order.status]}</span>
-          </div>
-
-          <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-            {NEXT_STATUS[order.status] && (
-              <button type="button" className="fx-btn" onClick={() => advanceStatus(order.id)}>
-                {NEXT_ACTION_LABEL[order.status]}
-              </button>
-            )}
-            {order.status === 'SHIPPED' && (
-              <button type="button" className="fx-btn fx-btn-ghost" onClick={() => setMessageForId(order.id)}>
-                Get shipped message
-              </button>
-            )}
-            {(order.status === 'PENDING' || order.status === 'CONFIRMED') && (
-              <button type="button" className="fx-btn fx-btn-danger" onClick={() => cancelOrder(order.id)}>
-                Cancel order
-              </button>
-            )}
-          </div>
-
-          {messageForId === order.id && (
-            <div className="fx-card" style={{ marginTop: 14, background: 'var(--fx-surface-soft)' }}>
-              <p style={{ margin: '0 0 10px', whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>
-                {buildCustomerMessage(order)}
-              </p>
-              <button type="button" className="fx-btn" onClick={() => copyMessage(order)}>
-                {copiedId === order.id ? 'Copied!' : 'Copy message'}
-              </button>
-            </div>
-          )}
+      {error && (
+        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+          {error}
         </div>
-      ))}
+      )}
+
+      {orders === null && !error && <p className="fx-page-subtitle">กำลังโหลด...</p>}
+      {orders?.length === 0 && <div className="fx-card">ยังไม่มีการจอง</div>}
+
+      {orders?.map((order) => {
+        const itemsSummary = order.items.map((i) => `variant #${i.variantId} x${i.qty}`).join(', ')
+        return (
+          <div className="fx-card" key={order.id} style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+              <div>
+                <p className="fx-product-name" style={{ margin: 0 }}>
+                  {order.code} • {order.customerName}
+                  {order.source === 'IN_STORE' && (
+                    <span className="fx-user-badge" style={{ marginLeft: 8 }}>
+                      หน้าร้าน
+                    </span>
+                  )}
+                </p>
+                <span className="fx-page-subtitle">
+                  {itemsSummary} • ส่ง{order.shippingMethod} • กำหนดคืน {order.returnDate} • ฿{order.finalPrice}
+                </span>
+              </div>
+              <span className="fx-user-badge">{STATUS_LABEL[order.status]}</span>
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+              {NEXT_STATUS[order.status] && (
+                <button type="button" className="fx-btn" disabled={busyId === order.id} onClick={() => advanceStatus(order)}>
+                  {NEXT_ACTION_LABEL[order.status]}
+                </button>
+              )}
+              {order.status === 'SHIPPED' && (
+                <button type="button" className="fx-btn fx-btn-ghost" onClick={() => setMessageForId(order.id)}>
+                  Get shipped message
+                </button>
+              )}
+              {(order.status === 'PENDING' || order.status === 'CONFIRMED') && (
+                <button type="button" className="fx-btn fx-btn-danger" disabled={busyId === order.id} onClick={() => cancelOrder(order.id)}>
+                  Cancel order
+                </button>
+              )}
+            </div>
+
+            {messageForId === order.id && (
+              <div className="fx-card" style={{ marginTop: 14, background: 'var(--fx-surface-soft)' }}>
+                <p style={{ margin: '0 0 10px', whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>
+                  {buildCustomerMessage(order)}
+                </p>
+                <button type="button" className="fx-btn" onClick={() => copyMessage(order)}>
+                  {copiedId === order.id ? 'Copied!' : 'Copy message'}
+                </button>
+              </div>
+            )}
+          </div>
+        )
+      })}
     </FxLayout>
   )
 }

@@ -1,7 +1,7 @@
-package com.g10.rental.web;
+package com.g10.rental.controller;
 
 import com.g10.rental.security.CustomOAuth2User;
-import com.g10.rental.web.dto.UserResponse;
+import com.g10.rental.dto.user.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

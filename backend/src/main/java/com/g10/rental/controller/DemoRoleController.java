@@ -1,4 +1,4 @@
-package com.g10.rental.web;
+package com.g10.rental.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

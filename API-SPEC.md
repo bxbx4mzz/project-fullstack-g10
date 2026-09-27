@@ -55,25 +55,37 @@ Frontend มีหน้าตาไว้หมดแล้ว (mock data ล�
 
 ### 2.1 Products & Variants (ชุดให้เช่า)
 
-ชุดหนึ่งตัว (เช่น "Elsa dress") มีได้หลาย variant (ไซส์/สี) แต่ละ variant มีสต็อก+ราคาของตัวเอง
-รหัสสินค้า (SKU) ให้ backend gen อัตโนมัติตอนสร้าง ไม่ต้องรับจาก client
+> **อัปเดต:** branch `backend-customer` (ยังไม่ merge เข้า `frontend`/`main`) มี CRUD พื้นฐานของ
+> `Product` ทำไว้แล้วบางส่วน — ดูโค้ดจริงได้ที่ `rental/src/main/java/com/g10/rental/{entity,controller,service,dto/product}`
+> **แต่ยังไม่มี variant (ไซส์/สี แยกสต็อก)** ตามที่ frontend ต้องการ (ดูหน้า [ProductDetailModal.tsx](frontend/src/pages/shop/components/ProductDetailModal.tsx),
+> [ProductFormModal.tsx](frontend/src/pages/shop/components/ProductFormModal.tsx)) — ต้องต่อยอดเพิ่ม
 
-| Method | Path | Role | Body / Query |
+**มีแล้วใน `backend-customer` (`/api/products`):**
+| Method | Path | Role | หมายเหตุ |
 |---|---|---|---|
-| GET | `/api/staff/products?search=` | STAFF, ADMIN | list สินค้า (filter ด้วยชื่อได้) |
-| GET | `/api/staff/products/{id}` | STAFF, ADMIN | รายละเอียดสินค้า + variants ทั้งหมด |
-| POST | `/api/staff/products` | STAFF, ADMIN | สร้างสินค้าใหม่ (ชื่อ, รูป, รายละเอียด) |
-| PUT | `/api/staff/products/{id}` | STAFF, ADMIN | แก้ไขข้อมูลสินค้า |
-| DELETE | `/api/staff/products/{id}` | ADMIN | ลบสินค้า |
-| POST | `/api/staff/products/{id}/variants` | STAFF, ADMIN | เพิ่ม variant (ไซส์/สี/จำนวน/ราคา 3 tier) — auto-gen SKU |
-| PUT | `/api/staff/products/{id}/variants/{variantId}` | STAFF, ADMIN | แก้ variant |
-| DELETE | `/api/staff/products/{id}/variants/{variantId}` | ADMIN | ลบ variant |
+| GET | `/api/products` | CUSTOMER, STAFF, ADMIN | list สินค้าทั้งหมด |
+| GET | `/api/products/{id}` | CUSTOMER, STAFF, ADMIN | รายละเอียดสินค้า 1 ชิ้น |
+| POST | `/api/products` | STAFF, ADMIN | สร้างสินค้าใหม่ |
+| PUT | `/api/products/{id}` | STAFF, ADMIN | แก้ไขสินค้า |
+| DELETE | `/api/products/{id}` | STAFF, ADMIN | ลบสินค้า |
 
-**Suggested schema:**
+`CreateProductRequest`/`ProductResponse` ตอนนี้มีแค่: `name, description, price (BigDecimal), imageUrl, category (String), stock (Integer)`
+— **ยังไม่มี field สำหรับ SKU อัตโนมัติ, ไซส์, สี** และ `category` เป็น string อิสระ (ไม่มี whitelist/enum)
+
+**ที่ frontend ต้องการเพิ่ม (ยังไม่มีใน backend เลย ต้องทำต่อ):**
+1. **ไซส์/สี แยกเป็น variant** ของแต่ละ product (ชุดเดียวกันมีได้หลายไซส์/สี คนละสต็อก) — ตอนนี้ frontend
+   ทำเป็น mock array ง่ายๆ (`sizes: string[]`, `colors: string[]`) เก็บไว้ที่ตัว product เฉยๆ ยังไม่ใช่ stock แยกจริง
+   ถ้าจะทำให้ถูกต้องตามกฎ "เช็คของว่าง" ในเอกสารนี้ ต้องแยกเป็น entity `ProductVariant` (ดู suggested schema ด้านล่าง)
+2. **Auto-gen SKU** ตอนสร้างสินค้า/variant (ยังไม่มีเลยใน `CreateProductRequest` ปัจจุบัน)
+3. **Category เป็น whitelist + เพิ่มเองได้ ("add tag")** — ฝั่ง frontend ตอนนี้ default `dress, shirt, skirt, pants`
+   และเพิ่มหมวดใหม่ได้จาก UI (เก็บแค่ใน session, ไม่มี backend) ถ้าจะทำจริงต้องมีตาราง `Category` แยก หรืออย่างน้อย
+   endpoint `GET/POST /api/products/categories` ให้ backend เป็นตัวเก็บ source of truth แทน frontend
+
+**Suggested schema (ส่วนที่ยังขาด):**
 ```
-Product        : id, name, description, imageUrl, createdAt, updatedAt
 ProductVariant : id, productId, sku (auto), size, color, stockQty,
                  price3Day, price5Day, price7Day, extraDayPrice
+Category       : id, name   (หรือจะเก็บเป็น enum/whitelist ฝั่ง backend ก็ได้ ถ้าไม่อยากทำตารางแยก)
 ```
 
 ### 2.2 เช็คของว่าง (Availability)
@@ -103,6 +115,7 @@ Logic ต้องตรงตามกฎ **การเช็คของว�
   "returnDate": "2026-07-24",
   "shippingMethod": "EMS",
   "discount": 100,
+  "source": "ONLINE",
   "items": [
     { "variantId": 12, "qty": 1 },
     { "variantId": 34, "qty": 1 }
@@ -111,11 +124,17 @@ Logic ต้องตรงตามกฎ **การเช็คของว�
 ```
 ตอบกลับต้องมี `totalPrice` (คำนวณจาก tier pricing ของแต่ละ variant), `finalPrice` (หลังหักส่วนลด), และ `status` เริ่มต้นเป็น `PENDING`
 
+> **feature ใหม่ — บันทึกการจองหน้าร้าน (in-store booking):** เวลาลูกค้ามาซื้อ/เช่าที่หน้าร้านเอง staff/admin
+> ต้องบันทึกการจองได้เหมือน flow ปกติ (เลือกสินค้า → ใส่ชื่อลูกค้า → บันทึก) **แต่ข้ามหน้าชำระเงิน** เพราะลูกค้าจ่ายที่ร้านแล้ว
+> เพิ่ม field `source: "ONLINE" | "IN_STORE"` ใน `Booking` เพื่อแยกให้เห็นว่าจองผ่านเว็บหรือพนักงานบันทึกให้ที่ร้าน —
+> ดูตัวอย่าง UI ที่ทำเป็น mock ไว้แล้วที่ [AdminBookingPage.tsx](frontend/src/pages/shop/AdminBookingPage.tsx) (route `/staff-panel/booking`, `/admin-panel/booking`)
+> เวลาสร้างจริง แนะนำให้ booking ที่ `source: IN_STORE` เริ่ม status เป็น `CONFIRMED` เลย (ไม่ต้องรอ `PENDING`) เพราะลูกค้าจ่ายเงินต่อหน้าแล้ว
+
 **Suggested schema:**
 ```
 Booking      : id, code (auto เช่น B0007), customerName, shippingAddress,
                rentDate, returnDate, shippingMethod (EMS/MESSENGER/PICKUP),
-               discount, totalPrice, finalPrice, status, createdAt
+               discount, totalPrice, finalPrice, status, source (ONLINE/IN_STORE), createdAt
 BookingItem  : id, bookingId, variantId, qty, unitPrice
 
 BookingStatus enum: PENDING, CONFIRMED, RETURNED, CANCELLED
@@ -188,4 +207,7 @@ Booking ที่ `CANCELLED` ไม่ต้องนับใน availability 
 
 - `frontend/src/lib/api.ts` — มี pattern เรียก API ผ่าน `fetch` + `credentials: 'include'` อยู่แล้ว (ดู `listUsers`, `updateUserRole` เป็นตัวอย่าง) เพิ่มฟังก์ชันคล้ายๆ กันสำหรับ products/bookings ได้เลย
 - Role-based routing (`/staff-panel/*`, `/admin-panel/*`) พร้อมใช้แล้วใน `App.tsx`
-- ทุกหน้า mock data อยู่ใน `frontend/src/pages/shop/components/navItems.ts` (`mockProducts`) และในแต่ละไฟล์ page เอง — พอมี API จริงค่อยเอา `useEffect` + `fetch` แทน mock array ตรงนั้น
+- **`frontend/src/pages/shop/components/store.ts`** — mock data ของ products/categories/orders ทั้งหมดย้ายมารวมไว้ที่นี่แล้ว (แทนที่ `mockProducts` เดิมที่เคยอยู่ใน `navItems.ts`) ใช้ `useSyncExternalStore` ทำเป็น store กลางแบบง่ายๆ ให้หน้า Home/Edit Items/Orders/New Booking เห็นข้อมูลตรงกันระหว่าง session (ยังไม่ persist ข้าม reload เพราะไม่มี backend) — พอมี API จริงให้แทนที่ฟังก์ชันใน store.ts ด้วย fetch เรียก backend แทน
+- **Add product** ทำไว้แล้วที่ [ProductFormModal.tsx](frontend/src/pages/shop/components/ProductFormModal.tsx) (เปิดจากปุ่ม "+ Add product" ในหน้า Edit Items) — มี field ตรงกับ `CreateProductRequest` ของ `backend-customer` (name/description/price/imageUrl/category/stock) บวก sizes/colors ที่ backend ยังไม่รองรับ (ดูหัวข้อ 2.1) และ category แบบเลือก + เพิ่มเองได้ ("Add tag")
+- **ดูรายละเอียดสินค้า (variant)** ทำไว้ที่ [ProductDetailModal.tsx](frontend/src/pages/shop/components/ProductDetailModal.tsx) — โชว์ category/stock/sizes/colors ให้ลูกค้า/staff กดดูจากปุ่ม "ดูรายละเอียด"
+- **บันทึกการจองหน้าร้าน (in-store booking)** ทำไว้ที่ [AdminBookingPage.tsx](frontend/src/pages/shop/AdminBookingPage.tsx) (route `/staff-panel/booking`, `/admin-panel/booking`) — เลือกสินค้า+จำนวน, ใส่ชื่อลูกค้า+วันคืน, กดบันทึกแล้วไปโผล่ที่หน้า Orders ทันที (ไม่มีหน้าชำระเงิน)

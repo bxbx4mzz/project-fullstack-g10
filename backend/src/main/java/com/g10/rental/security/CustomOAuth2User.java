@@ -1,6 +1,6 @@
 package com.g10.rental.security;
 
-import com.g10.rental.model.User;
+import com.g10.rental.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
