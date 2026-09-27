@@ -10,6 +10,7 @@ import { ShopCalendarPage } from './pages/shop/ShopCalendarPage'
 import { ShopCartPage } from './pages/shop/ShopCartPage'
 import { ShopPaymentPage } from './pages/shop/ShopPaymentPage'
 import { ShopChatPage } from './pages/shop/ShopChatPage'
+import { ShopFavoritesPage } from './pages/shop/ShopFavoritesPage'
 import { ShopStatusPage } from './pages/shop/ShopStatusPage'
 import { AdminHomePage } from './pages/shop/AdminHomePage'
 import { AdminCalendarPage } from './pages/shop/AdminCalendarPage'
@@ -17,11 +18,13 @@ import { AdminOverviewPage } from './pages/shop/AdminOverviewPage'
 import { AdminEditPage } from './pages/shop/AdminEditPage'
 import { AdminUsersPage } from './pages/shop/AdminUsersPage'
 import { AdminOrdersPage } from './pages/shop/AdminOrdersPage'
+import { AdminBookingPage } from './pages/shop/AdminBookingPage'
 import { StaffHomePage } from './pages/shop/StaffHomePage'
 import { StaffCalendarPage } from './pages/shop/StaffCalendarPage'
 import { StaffOverviewPage } from './pages/shop/StaffOverviewPage'
 import { StaffEditPage } from './pages/shop/StaffEditPage'
 import { StaffOrdersPage } from './pages/shop/StaffOrdersPage'
+import { StaffBookingPage } from './pages/shop/StaffBookingPage'
 
 export default function App() {
   return (
@@ -75,6 +78,14 @@ export default function App() {
               }
             />
             <Route
+              path="/shop/favorites"
+              element={
+                <ProtectedRoute>
+                  <ShopFavoritesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/shop/status"
               element={
                 <ProtectedRoute>
@@ -124,6 +135,14 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/staff-panel/booking"
+              element={
+                <ProtectedRoute allowedRoles={['STAFF', 'ADMIN']}>
+                  <StaffBookingPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Admin area — ADMIN เท่านั้น */}
             <Route
@@ -163,6 +182,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>
                   <AdminOrdersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-panel/booking"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminBookingPage />
                 </ProtectedRoute>
               }
             />

@@ -1,7 +1,7 @@
 package com.g10.rental.security;
 
-import com.g10.rental.model.Role;
-import com.g10.rental.model.User;
+import com.g10.rental.entity.Role;
+import com.g10.rental.entity.User;
 import com.g10.rental.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;

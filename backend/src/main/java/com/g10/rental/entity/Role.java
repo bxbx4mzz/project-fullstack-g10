@@ -1,4 +1,4 @@
-package com.g10.rental.model;
+package com.g10.rental.entity;
 
 /**
  * CUSTOMER = ลูกค้าทั่วไป (default เมื่อ login ครั้งแรก)

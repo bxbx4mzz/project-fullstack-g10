@@ -1,4 +1,4 @@
-package com.g10.rental.model;
+package com.g10.rental.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

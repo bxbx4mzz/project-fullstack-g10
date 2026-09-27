@@ -1,6 +1,6 @@
 package com.g10.rental.repository;
 
-import com.g10.rental.model.User;
+import com.g10.rental.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { FxLayout } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
 import { useAuth } from '../../context/AuthContext'
-import { listUsers, updateUserRole, type CurrentUser, type Role } from '../../lib/api'
+import { deleteUser, listUsers, updateUserRole, type CurrentUser, type Role } from '../../lib/api'
 
 const ROLE_LABEL: Record<Role, string> = {
   CUSTOMER: 'Customer',
@@ -37,6 +37,19 @@ export function AdminUsersPage() {
     }
   }
 
+  async function handleDelete(id: number) {
+    setError(null)
+    setSavingId(id)
+    try {
+      await deleteUser(id)
+      setUsers((prev) => prev?.filter((u) => u.id !== id) ?? null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'ลบผู้ใช้ไม่สำเร็จ')
+    } finally {
+      setSavingId(null)
+    }
+  }
+
   return (
     <FxLayout brand="Admin - Clothing Rental Shop" navItems={adminNavItems}>
       <h1>จัดการสิทธิ์ผู้ใช้</h1>
@@ -59,6 +72,7 @@ export function AdminUsersPage() {
                 <th>อีเมล</th>
                 <th>สิทธิ์ปัจจุบัน</th>
                 <th>เปลี่ยนสิทธิ์เป็น</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -92,6 +106,19 @@ export function AdminUsersPage() {
                         </button>
                       ))}
                     </div>
+                  </td>
+                  <td>
+                    {me?.id !== u.id && (
+                      <button
+                        type="button"
+                        className="fx-btn fx-btn-danger"
+                        style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                        disabled={savingId === u.id}
+                        onClick={() => handleDelete(u.id)}
+                      >
+                        ลบ
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

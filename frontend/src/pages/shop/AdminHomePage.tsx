@@ -1,15 +1,26 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { FxLayout, type FxNavItem } from './components/FxLayout'
-import { adminNavItems, mockProducts } from './components/navItems'
+import { adminNavItems } from './components/navItems'
+import { useEnsureProductsLoaded, useProducts, useProductsError } from './components/store'
+import { ProductThumb } from './components/ProductThumb'
 
 type AdminHomePageProps = {
   brand?: string
   navItems?: FxNavItem[]
+  editPath?: string
 }
 
-export function AdminHomePage({ brand = 'Admin - Clothing Rental Shop', navItems = adminNavItems }: AdminHomePageProps) {
+export function AdminHomePage({
+  brand = 'Admin - Clothing Rental Shop',
+  navItems = adminNavItems,
+  editPath = '/admin-panel/edit',
+}: AdminHomePageProps) {
+  useEnsureProductsLoaded()
+  const products = useProducts()
+  const productsError = useProductsError()
   const [query, setQuery] = useState('')
-  const filteredProducts = mockProducts.filter((p) => p.name.toLowerCase().includes(query.trim().toLowerCase()))
+  const filteredProducts = products.filter((p) => p.name.toLowerCase().includes(query.trim().toLowerCase()))
 
   return (
     <FxLayout brand={brand} navItems={navItems}>
@@ -31,18 +42,24 @@ export function AdminHomePage({ brand = 'Admin - Clothing Rental Shop', navItems
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {filteredProducts.length === 0 && <p className="fx-page-subtitle">ไม่พบสินค้าที่ตรงกับ "{query}"</p>}
+      {productsError && (
+        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+          {productsError}
+        </div>
+      )}
+
+      {filteredProducts.length === 0 && !productsError && <p className="fx-page-subtitle">ไม่พบสินค้าที่ตรงกับ "{query}"</p>}
 
       <div className="fx-grid">
         {filteredProducts.map((p) => (
           <div className="fx-card fx-product" key={p.id}>
-            <div className="fx-product-thumb">{p.icon}</div>
+            <ProductThumb icon={p.icon} />
             <div className="fx-product-name">{p.name}</div>
             <div className="fx-product-price">{p.price}</div>
             <div className="fx-product-actions">
-              <button type="button" className="fx-btn fx-btn-ghost">
+              <Link to={`${editPath}?id=${p.id}`} className="fx-btn fx-btn-ghost">
                 แก้ไข
-              </button>
+              </Link>
             </div>
           </div>
         ))}
