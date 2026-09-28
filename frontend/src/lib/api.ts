@@ -311,6 +311,11 @@ export function updateBookingStatus(id: number, status: BookingStatus): Promise<
   return apiFetch(`/api/staff/bookings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) })
 }
 
+export async function fetchBookingSummaryMessage(id: number): Promise<string> {
+  const res = await apiFetch<{ message: string }>(`/api/staff/bookings/${id}/summary-message`)
+  return res.message
+}
+
 export interface DashboardSummary {
   totalBookings: number
   activeBookings: number

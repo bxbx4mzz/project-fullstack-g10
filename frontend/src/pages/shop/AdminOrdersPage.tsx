@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FxLayout, type FxNavItem } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
-import { fetchStaffBookings, updateBookingStatus, type ApiBooking, type BookingStatus } from '../../lib/api'
+import { fetchBookingSummaryMessage, fetchStaffBookings, updateBookingStatus, type ApiBooking, type BookingStatus } from '../../lib/api'
 
 const STATUS_LABEL: Record<BookingStatus, string> = {
   PENDING: 'Pending',
@@ -23,11 +23,6 @@ const NEXT_ACTION_LABEL: Partial<Record<BookingStatus, string>> = {
   SHIPPED: 'Mark as returned',
 }
 
-function buildCustomerMessage(booking: ApiBooking): string {
-  const itemsSummary = booking.items.map((i) => `variant #${i.variantId} x${i.qty}`).join(', ')
-  return `สวัสดีค่ะคุณ${booking.customerName} 🎉\nชุดที่คุณเช่า (${itemsSummary}) ถูกจัดส่งแล้วทาง ${booking.shippingMethod} ค่ะ\nกรุณาส่งคืนภายในวันที่ ${booking.returnDate} นะคะ ขอบคุณที่ใช้บริการค่ะ 🙏`
-}
-
 type AdminOrdersPageProps = {
   brand?: string
   navItems?: FxNavItem[]
@@ -37,6 +32,8 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
   const [orders, setOrders] = useState<ApiBooking[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [messageForId, setMessageForId] = useState<number | null>(null)
+  const [messageText, setMessageText] = useState<string | null>(null)
+  const [messageLoading, setMessageLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
 
@@ -59,12 +56,25 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
     setBusyId(order.id)
     try {
       await updateBookingStatus(order.id, next)
-      if (order.status === 'CONFIRMED') setMessageForId(order.id)
+      if (order.status === 'CONFIRMED') await showMessage(order.id)
       await load()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เปลี่ยนสถานะไม่สำเร็จ')
     } finally {
       setBusyId(null)
+    }
+  }
+
+  async function showMessage(orderId: number) {
+    setMessageForId(orderId)
+    setMessageText(null)
+    setMessageLoading(true)
+    try {
+      setMessageText(await fetchBookingSummaryMessage(orderId))
+    } catch (err) {
+      setMessageText(err instanceof Error ? err.message : 'โหลดข้อความสรุปไม่สำเร็จ')
+    } finally {
+      setMessageLoading(false)
     }
   }
 
@@ -81,8 +91,9 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
   }
 
   async function copyMessage(order: ApiBooking) {
+    if (!messageText) return
     try {
-      await navigator.clipboard.writeText(buildCustomerMessage(order))
+      await navigator.clipboard.writeText(messageText)
       setCopiedId(order.id)
       setTimeout(() => setCopiedId(null), 2000)
     } catch {
@@ -132,7 +143,7 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
                 </button>
               )}
               {order.status === 'SHIPPED' && (
-                <button type="button" className="fx-btn fx-btn-ghost" onClick={() => setMessageForId(order.id)}>
+                <button type="button" className="fx-btn fx-btn-ghost" onClick={() => showMessage(order.id)}>
                   Get shipped message
                 </button>
               )}
@@ -146,9 +157,9 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
             {messageForId === order.id && (
               <div className="fx-card" style={{ marginTop: 14, background: 'var(--fx-surface-soft)' }}>
                 <p style={{ margin: '0 0 10px', whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>
-                  {buildCustomerMessage(order)}
+                  {messageLoading ? 'กำลังโหลด...' : messageText}
                 </p>
-                <button type="button" className="fx-btn" onClick={() => copyMessage(order)}>
+                <button type="button" className="fx-btn" disabled={messageLoading || !messageText} onClick={() => copyMessage(order)}>
                   {copiedId === order.id ? 'Copied!' : 'Copy message'}
                 </button>
               </div>

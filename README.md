@@ -45,23 +45,83 @@ UPDATE users SET role = 'STAFF' WHERE email = 'someone@example.com';
 
 ---
 
-## Setup & รัน
+## Setup & รัน (Windows)
 
-**เตรียม:** JDK 21 (แนะนำรัน backend ผ่าน Docker เลี่ยงปัญหาเวอร์ชัน JDK บนเครื่อง),
-Node.js + pnpm, Docker Desktop
+**เตรียมเครื่องก่อน — ต้องติดตั้ง 3 อย่างนี้:**
 
-1. สร้าง Google OAuth Client ที่ [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   → redirect URI = `http://localhost:8080/login/oauth2/code/google`
-2. `cp backend/.env.example backend/.env` แล้วใส่ `GOOGLE_CLIENT_ID/SECRET`, `ADMIN_EMAILS`
-3. `cp frontend/.env.example frontend/.env`
-4. รัน:
+| โปรแกรม | ใช้ทำอะไร | โหลดที่ไหน |
+|---|---|---|
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | รัน backend + PostgreSQL (ไม่ต้องลง JDK/Postgres เองบนเครื่อง) | ติดตั้งแล้วต้องเปิดโปรแกรมทิ้งไว้ (ดู icon วาฬที่ system tray ว่าติ๊บสีเขียว) |
+| [Node.js](https://nodejs.org/) (LTS) | รัน frontend (React + Vite) | ติดตั้งแบบปกติ (Next → Next → Install) |
+| pnpm | package manager ของ frontend | ลงผ่านคำสั่งข้างล่าง (ข้อ 2) |
+
+### ขั้นตอน
+
+1. **Clone โปรเจกต์แล้วเข้าไปที่โฟลเดอร์**
    ```bash
-   cd backend && docker compose up -d --build     # postgres + backend
-   cd ../frontend && pnpm install && pnpm dev     # http://localhost:5173
+   git clone https://github.com/bxbx4mzz/project-fullstack-g10.git
+   cd project-fullstack-g10
    ```
-5. แก้โค้ด backend แล้วอยาก reload: `docker compose restart backend` (~1-1.5 นาที)
 
-รันแบบ docker เต็มระบบ (frontend ผ่าน nginx ด้วย) ดูรายละเอียดใน `backend/docker-compose.yml`
+2. **ลง pnpm** (ทำครั้งเดียวต่อเครื่อง ข้ามได้ถ้ามีอยู่แล้ว — เช็คด้วย `pnpm --version`)
+   ```bash
+   npm install -g pnpm
+   ```
+
+3. **สร้าง Google OAuth Client** ที่ [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   → ตอนตั้งค่า **Authorized redirect URI** ใส่: `http://localhost:8080/login/oauth2/code/google`
+   → เก็บ **Client ID** กับ **Client Secret** ไว้ใช้ในข้อ 4
+
+4. **ตั้งค่า environment variables ฝั่ง backend**
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+   เปิดไฟล์ `backend/.env` แล้วใส่ค่า:
+   - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — จากข้อ 3
+   - `ADMIN_EMAILS` — อีเมล Google ของตัวเอง (จะได้สิทธิ์ ADMIN ตอน login ครั้งแรก)
+   - `STAFF_EMAILS` — อีเมลที่อยากให้เป็น STAFF (ถ้ามี)
+
+5. **ตั้งค่า environment variables ฝั่ง frontend**
+   ```bash
+   cp frontend/.env.example frontend/.env
+   ```
+   ค่า default ใน `frontend/.env` ใช้ได้เลยไม่ต้องแก้อะไร (ชี้ไปที่ backend `http://localhost:8080` อยู่แล้ว)
+
+6. **รัน backend + database ผ่าน Docker** (เปิด Docker Desktop ทิ้งไว้ก่อน)
+   ```bash
+   cd backend
+   docker compose up -d --build
+   ```
+   รอบแรกจะช้าหน่อย (โหลด image + build ~2-5 นาที) เช็คว่าขึ้นสำเร็จด้วย `docker compose ps` — ต้องเห็น `g10-pj-backend` และ `g10-pj-postgres` เป็น `running`/`healthy`
+
+7. **ติดตั้ง dependency ฝั่ง frontend**
+   ```bash
+   cd ../frontend
+   pnpm.cmd install
+   ```
+
+8. **รัน frontend dev server**
+   ```bash
+   pnpm.cmd run dev
+   ```
+   เสร็จแล้วเปิดเบราว์เซอร์ไปที่ **http://localhost:5173**
+
+> หมายเหตุ: ใช้ `pnpm.cmd` (ไม่ใช่ `pnpm` เฉย ๆ) เพราะรันบน PowerShell — ดูเหตุผลเต็มๆ ท้าย README หรือใช้ Git Bash แทนก็พิมพ์ `pnpm` เฉยๆ ได้โดยไม่ต้องมี `.cmd`
+
+**หลังตั้งค่าเสร็จรอบแรก** ครั้งต่อไปแค่รัน:
+```bash
+cd backend && docker compose up -d      # ถ้ายังรันอยู่ไม่ต้องรันซ้ำ
+cd ../frontend && pnpm.cmd run dev
+```
+
+**แก้โค้ด backend แล้วอยาก reload:**
+```bash
+cd backend
+docker compose restart backend
+```
+(รอ ~1-1.5 นาที)
+
+รันแบบ docker เต็มระบบ (frontend ผ่าน nginx ด้วย ไม่ต้องรัน `pnpm dev`) ดูรายละเอียดใน `backend/docker-compose.yml`
 และ `frontend/docker-compose.yml`
 
 ---
