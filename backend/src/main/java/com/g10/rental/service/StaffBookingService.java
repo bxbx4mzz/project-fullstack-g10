@@ -4,8 +4,10 @@ import com.g10.rental.entity.Booking;
 import com.g10.rental.entity.BookingItem;
 import com.g10.rental.entity.BookingSource;
 import com.g10.rental.entity.BookingStatus;
+import com.g10.rental.entity.Product;
 import com.g10.rental.entity.ProductVariant;
 import com.g10.rental.repository.BookingRepository;
+import com.g10.rental.repository.ProductRepository;
 import com.g10.rental.repository.ProductVariantRepository;
 import com.g10.rental.dto.availability.AvailabilityResponse;
 import com.g10.rental.dto.booking.BookingResponse;
@@ -23,6 +25,7 @@ import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -41,6 +44,7 @@ public class StaffBookingService {
 
     private final BookingRepository bookingRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final ProductRepository productRepository;
     private final AvailabilityService availabilityService;
 
     @Transactional(readOnly = true)
@@ -148,5 +152,53 @@ public class StaffBookingService {
                 .toList();
 
         return new DailyTasksResponse(targetDate, toDispatch, toReturn);
+    }
+
+    /**
+     * Plain-text order summary for staff to copy/paste to the customer.
+     * Idea ported from branch backend-admin's RentalAdminService#generateChatSummary, adapted to
+     * the Booking/BookingItem entities (variantId lookup instead of RentalItem's direct
+     * Product/ProductVariant relation).
+     */
+    @Transactional(readOnly = true)
+    public String generateSummaryMessage(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ไม่พบข้อมูลการจองนี้"));
+
+        long totalDays = ChronoUnit.DAYS.between(booking.getRentDate(), booking.getReturnDate()) + 1;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("สรุปรายการจองชุด [รหัส: ").append(booking.getCode()).append("]\n");
+        sb.append("ชื่อลูกค้า: ").append(booking.getCustomerName()).append("\n");
+        sb.append("ที่อยู่จัดส่ง: ").append(booking.getShippingAddress()).append("\n");
+        sb.append("วันที่เช่า: ").append(booking.getRentDate()).append(" ถึง ").append(booking.getReturnDate())
+                .append(" (").append(totalDays).append(" วัน)\n");
+        sb.append("วิธีจัดส่ง: ").append(booking.getShippingMethod()).append("\n");
+        sb.append("---------------------------\n");
+        sb.append("รายการชุด:\n");
+
+        int index = 1;
+        for (BookingItem item : booking.getItems()) {
+            ProductVariant variant = productVariantRepository.findById(item.getVariantId()).orElse(null);
+            Product product = variant != null ? productRepository.findById(variant.getProductId()).orElse(null) : null;
+            BigDecimal subtotal = item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQty()));
+
+            sb.append("  ").append(index++).append(") ")
+                    .append(product != null ? product.getName() : "สินค้า #" + item.getVariantId())
+                    .append(" (").append(variant != null ? variant.getColor() : "-")
+                    .append(", ไซส์ ").append(variant != null ? variant.getSize() : "-").append(")")
+                    .append(" จำนวน ").append(item.getQty())
+                    .append(" = ").append(subtotal).append(" บาท\n");
+        }
+
+        sb.append("---------------------------\n");
+        sb.append("ยอดรวม: ").append(booking.getTotalPrice()).append(" บาท\n");
+        if (booking.getDiscount().compareTo(BigDecimal.ZERO) > 0) {
+            sb.append("ส่วนลด: ").append(booking.getDiscount()).append(" บาท\n");
+        }
+        sb.append("ยอดสุทธิที่ต้องชำระ: ").append(booking.getFinalPrice()).append(" บาท\n");
+        sb.append("สถานะ: ").append(booking.getStatus()).append("\n");
+
+        return sb.toString();
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * New — not in either source branch. STAFF/ADMIN booking management, gated by the existing
@@ -54,5 +55,10 @@ public class StaffBookingController {
     public DailyTasksResponse dailyTasks(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return staffBookingService.dailyTasks(date);
+    }
+
+    @GetMapping("/bookings/{id}/summary-message")
+    public Map<String, String> summaryMessage(@PathVariable Long id) {
+        return Map.of("message", staffBookingService.generateSummaryMessage(id));
     }
 }
