@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Scoped styles for the shop/admin UI (Figma: ux-ui-shop) — light cream theme.
    Everything lives under .fx-app so it never touches the existing global styles. */
 
@@ -13,105 +15,61 @@
   --fx-accent-soft: #f6e9cf;
   --fx-danger: #d9534f;
 
-  min-height: 100vh;
-  background: #f1ebdd;
-  color: var(--fx-text);
+  @apply min-h-screen bg-[#f1ebdd] text-[var(--fx-text)];
   font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .fx-app * {
-  box-sizing: border-box;
+  @apply box-border;
 }
 
 .fx-app a {
-  color: inherit;
+  @apply text-inherit;
 }
 
 /* ---------- Layout: sidebar pinned left, content balanced in the remaining space ---------- */
 
 .fx-shell {
-  display: flex;
-  min-height: 100vh;
-  background: var(--fx-bg);
+  @apply flex min-h-screen bg-[var(--fx-bg)];
 }
 
 .fx-sidebar {
-  width: 220px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  @apply sticky top-0 flex h-screen w-[220px] shrink-0 flex-col gap-1.5 border-r px-3.5 py-5;
   background: var(--fx-surface);
-  border-right: 1px solid var(--fx-border);
-  padding: 20px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  border-color: var(--fx-border);
 }
 
 .fx-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
+  @apply flex min-w-0 flex-1 justify-center;
 }
 
 .fx-sidebar-brand {
-  font-weight: 700;
-  font-size: 1.05rem;
-  padding: 6px 10px 18px;
+  @apply px-2.5 pb-4 pt-1.5 text-[1.05rem] font-bold;
   color: var(--fx-accent-dark);
 }
 
 .fx-user-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 12px;
+  @apply mb-2.5 flex items-center gap-2.5 rounded-xl p-2.5;
   background: var(--fx-surface-soft);
 }
 
 .fx-user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  @apply h-9 w-9 shrink-0 rounded-full;
 }
 
 .fx-user-name {
-  font-weight: 600;
-  font-size: 0.85rem;
-  line-height: 1.3;
+  @apply text-[0.85rem] font-semibold leading-tight;
 }
 
 .fx-user-badge {
-  display: inline-block;
-  margin-top: 2px;
-  padding: 1px 8px;
-  border-radius: 999px;
+  @apply mt-0.5 inline-block rounded-full px-2 py-px text-[0.72rem] font-semibold;
   background: var(--fx-accent-soft);
   color: var(--fx-accent-dark);
-  font-size: 0.72rem;
-  font-weight: 600;
 }
 
 .fx-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  text-decoration: none;
+  @apply flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] border-none bg-transparent px-3 py-2.5 text-left text-[0.92rem] font-medium no-underline;
   color: var(--fx-text);
-  font-size: 0.92rem;
-  font-weight: 500;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
 }
 
 .fx-nav-item:hover {
@@ -119,54 +77,40 @@
 }
 
 .fx-nav-item.active {
+  @apply font-bold;
   background: var(--fx-accent-soft);
   color: var(--fx-accent-dark);
-  font-weight: 700;
 }
 
 .fx-nav-spacer {
-  flex: 1;
+  @apply flex-1;
 }
 
 .fx-content {
-  width: 100%;
-  max-width: 1000px;
-  padding: 32px 40px;
+  @apply w-full max-w-[1000px] px-10 py-8;
 }
 
 .fx-content h1 {
-  margin: 0 0 4px;
-  font-size: 1.4rem;
+  @apply m-0 mb-1 text-[1.4rem];
 }
 
 .fx-content .fx-page-subtitle {
+  @apply m-0 mb-5;
   color: var(--fx-text-muted);
-  margin: 0 0 20px;
 }
 
 /* ---------- Cards / generic ---------- */
 
 .fx-card {
+  @apply rounded-[14px] border p-5;
   background: var(--fx-surface);
-  border: 1px solid var(--fx-border);
-  border-radius: 14px;
-  padding: 20px;
+  border-color: var(--fx-border);
 }
 
 .fx-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: 1px solid var(--fx-accent);
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-[10px] border px-[18px] py-2.5 text-[0.92rem] font-semibold text-white no-underline;
+  border-color: var(--fx-accent);
   background: var(--fx-accent);
-  color: #ffffff;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 0.92rem;
 }
 
 .fx-btn:hover {
@@ -175,7 +119,7 @@
 }
 
 .fx-btn.fx-btn-ghost {
-  background: transparent;
+  @apply bg-transparent;
   color: var(--fx-accent-dark);
 }
 
@@ -191,25 +135,19 @@
 /* ---------- Form fields (used by admin edit) ---------- */
 
 .fx-field {
-  text-align: left;
-  margin-top: 16px;
+  @apply mt-4 text-left;
 }
 
 .fx-field label {
-  display: block;
-  font-size: 0.85rem;
+  @apply mb-1.5 block text-[0.85rem];
   color: var(--fx-text-muted);
-  margin-bottom: 6px;
 }
 
 .fx-field input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--fx-border);
+  @apply w-full rounded-lg border px-3 py-2.5 text-[0.95rem];
+  border-color: var(--fx-border);
   background: var(--fx-bg);
   color: var(--fx-text);
-  font-size: 0.95rem;
 }
 
 .fx-field input:focus {
@@ -221,91 +159,58 @@
 /* ---------- Modal (product detail / add product) ---------- */
 
 .fx-modal-backdrop {
-  position: fixed;
-  inset: 0;
+  @apply fixed inset-0 z-50 flex items-center justify-center p-5;
   background: rgba(63, 58, 52, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 50;
 }
 
 .fx-modal-card {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  max-height: 90vh;
-  overflow-y: auto;
+  @apply relative max-h-[90vh] w-full max-w-[400px] overflow-y-auto rounded-2xl px-6 py-7;
   background: var(--fx-surface);
-  border-radius: 16px;
-  padding: 28px 24px;
 }
 
 .fx-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid var(--fx-border);
+  @apply absolute right-3.5 top-3.5 h-[30px] w-[30px] cursor-pointer rounded-full border;
+  border-color: var(--fx-border);
   background: var(--fx-surface);
-  cursor: pointer;
   color: var(--fx-text-muted);
 }
 
 .fx-detail-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  font-size: 0.9rem;
+  @apply mt-3 flex items-center gap-2.5 text-[0.9rem];
 }
 
 .fx-detail-label {
+  @apply min-w-[70px];
   color: var(--fx-text-muted);
-  min-width: 70px;
 }
 
 .fx-tag-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  @apply flex flex-wrap gap-1.5;
 }
 
 .fx-tag {
-  padding: 2px 10px;
-  border-radius: 999px;
+  @apply rounded-full border px-2.5 py-0.5 text-[0.8rem];
   background: var(--fx-surface-soft);
-  border: 1px solid var(--fx-border);
-  font-size: 0.8rem;
+  border-color: var(--fx-border);
 }
 
 .fx-chip {
-  padding: 6px 14px;
-  border-radius: 999px;
+  @apply cursor-pointer rounded-full border px-3.5 py-1.5 text-[0.85rem];
   background: var(--fx-surface-soft);
-  border: 1px solid var(--fx-border);
-  font-size: 0.85rem;
-  cursor: pointer;
+  border-color: var(--fx-border);
   color: var(--fx-text);
 }
 
 .fx-chip.active {
+  @apply font-semibold text-white;
   background: var(--fx-accent);
   border-color: var(--fx-accent);
-  color: #ffffff;
-  font-weight: 600;
 }
 
 .fx-favorite-btn {
-  border: 1px solid var(--fx-border);
+  @apply w-10 cursor-pointer rounded-lg border text-base;
+  border-color: var(--fx-border);
   background: var(--fx-surface);
-  border-radius: 8px;
-  width: 40px;
-  cursor: pointer;
-  font-size: 1rem;
 }
 
 .fx-favorite-btn.active {
@@ -314,28 +219,19 @@
 }
 
 .fx-modal-card select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--fx-border);
+  @apply w-full rounded-lg border px-3 py-2.5 text-[0.95rem];
+  border-color: var(--fx-border);
   background: var(--fx-bg);
   color: var(--fx-text);
-  font-size: 0.95rem;
 }
 
 /* ---------- Search input ---------- */
 
 .fx-search-input {
-  width: 100%;
-  max-width: 360px;
-  padding: 10px 14px;
-  margin-bottom: 18px;
-  border-radius: 10px;
-  border: 1px solid var(--fx-border);
+  @apply mb-[18px] w-full max-w-[360px] rounded-[10px] border px-3.5 py-2.5 font-[inherit] text-[0.92rem];
+  border-color: var(--fx-border);
   background: var(--fx-surface);
   color: var(--fx-text);
-  font-size: 0.92rem;
-  font-family: inherit;
 }
 
 .fx-search-input:focus {
@@ -346,316 +242,219 @@
 /* ---------- Promo banner ---------- */
 
 .fx-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @apply mb-[22px] flex items-center justify-between rounded-2xl border px-7 py-[22px];
   background: var(--fx-accent-soft);
-  border: 1px solid var(--fx-accent);
-  border-radius: 16px;
-  padding: 22px 28px;
-  margin-bottom: 22px;
+  border-color: var(--fx-accent);
 }
 
 .fx-banner h2 {
-  margin: 0;
-  font-size: 1.5rem;
+  @apply m-0 text-2xl;
   color: var(--fx-accent-dark);
 }
 
 .fx-banner p {
-  margin: 4px 0 0;
+  @apply mb-0 mt-1;
   color: var(--fx-text-muted);
 }
 
 /* ---------- Product grid ---------- */
 
 .fx-grid {
-  display: grid;
+  @apply grid gap-4;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
 }
 
 .fx-product {
+  @apply flex flex-col gap-2 rounded-[14px] border p-3.5;
   background: var(--fx-surface);
-  border: 1px solid var(--fx-border);
-  border-radius: 14px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  border-color: var(--fx-border);
 }
 
 
 .fx-product-thumb {
-  height: 110px;
-  border-radius: 10px;
+  @apply flex h-[110px] items-center justify-center rounded-[10px] text-[2.2rem];
   background: var(--fx-surface-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.2rem;
 }
 
 .fx-product-name {
-  font-weight: 600;
-  font-size: 0.92rem;
+  @apply text-[0.92rem] font-semibold;
 }
 
 .fx-product-price {
+  @apply font-bold;
   color: var(--fx-accent-dark);
-  font-weight: 700;
 }
 
 .fx-product-actions {
-  display: flex;
-  gap: 6px;
-  margin-top: auto;
+  @apply mt-auto flex gap-1.5;
 }
 
 .fx-product-actions .fx-btn {
-  flex: 1;
-  padding: 8px 10px;
-  font-size: 0.82rem;
+  @apply flex-1 px-2.5 py-2 text-[0.82rem];
 }
 
 /* ---------- Calendar ---------- */
 
 .fx-cal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
+  @apply mb-3.5 flex items-center justify-between;
 }
 
 .fx-cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  @apply grid grid-cols-7 gap-1.5;
 }
 
 .fx-cal-dow {
-  text-align: center;
-  font-size: 0.8rem;
+  @apply pb-1.5 text-center text-[0.8rem] font-semibold;
   color: var(--fx-text-muted);
-  padding-bottom: 6px;
-  font-weight: 600;
 }
 
 .fx-cal-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  border: 1px solid var(--fx-border);
+  @apply flex aspect-square cursor-pointer items-center justify-center rounded-[10px] border text-[0.88rem];
+  border-color: var(--fx-border);
   background: var(--fx-surface);
-  font-size: 0.88rem;
-  cursor: pointer;
 }
 
 .fx-cal-day.fx-cal-muted {
+  @apply opacity-50;
   color: var(--fx-text-muted);
-  opacity: 0.5;
 }
 
 .fx-cal-day.fx-cal-booked {
+  @apply font-bold;
   background: var(--fx-accent-soft);
   border-color: var(--fx-accent);
-  font-weight: 700;
   color: var(--fx-accent-dark);
 }
 
 .fx-cal-day.fx-cal-today {
+  @apply border-2;
   border-color: var(--fx-accent-dark);
-  border-width: 2px;
 }
 
 /* ---------- Cart ---------- */
 
 .fx-cart-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--fx-border);
+  @apply flex items-center gap-3.5 border-b py-3;
+  border-color: var(--fx-border);
 }
 
 .fx-cart-item:last-child {
-  border-bottom: none;
+  @apply border-b-0;
 }
 
 .fx-cart-thumb {
-  width: 56px;
-  height: 56px;
-  border-radius: 10px;
+  @apply flex h-14 w-14 shrink-0 items-center justify-center rounded-[10px] text-xl;
   background: var(--fx-surface-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  flex-shrink: 0;
 }
 
 .fx-cart-info {
-  flex: 1;
+  @apply flex-1;
 }
 
 .fx-cart-info .fx-product-name {
-  margin: 0;
+  @apply m-0;
 }
 
 .fx-cart-qty {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  @apply flex items-center gap-2;
 }
 
 .fx-cart-qty button {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  border: 1px solid var(--fx-border);
+  @apply h-[26px] w-[26px] cursor-pointer rounded-md border;
+  border-color: var(--fx-border);
   background: var(--fx-surface);
-  cursor: pointer;
 }
 
 .fx-cart-summary {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 0.92rem;
+  @apply flex justify-between py-2 text-[0.92rem];
 }
 
 .fx-cart-summary.fx-cart-total {
-  font-weight: 700;
-  font-size: 1.05rem;
-  border-top: 1px solid var(--fx-border);
-  margin-top: 8px;
-  padding-top: 14px;
+  @apply mt-2 border-t pt-3.5 text-[1.05rem] font-bold;
+  border-color: var(--fx-border);
 }
 
 /* ---------- Payment ---------- */
 
 .fx-payment-card {
-  max-width: 340px;
-  margin: 0 auto;
-  text-align: center;
+  @apply mx-auto max-w-[340px] text-center;
 }
 
 .fx-qr {
-  width: 200px;
-  height: 200px;
-  margin: 16px auto;
-  border-radius: 12px;
-  border: 1px solid var(--fx-border);
+  @apply mx-auto my-4 h-[200px] w-[200px] rounded-xl border opacity-85;
+  border-color: var(--fx-border);
   background: repeating-linear-gradient(
       45deg,
       var(--fx-text) 0 4px,
       transparent 4px 8px
     )
     0 0 / 100% 100%;
-  opacity: 0.85;
 }
 
 .fx-payment-amount {
-  font-size: 1.8rem;
-  font-weight: 700;
+  @apply my-2 mb-5 text-[1.8rem] font-bold;
   color: var(--fx-accent-dark);
-  margin: 8px 0 20px;
 }
 
 .fx-payment-actions {
-  display: flex;
-  gap: 10px;
+  @apply flex gap-2.5;
 }
 
 .fx-payment-actions .fx-btn {
-  flex: 1;
+  @apply flex-1;
 }
 
 /* ---------- Chat AI ---------- */
 
 .fx-chat {
-  display: flex;
-  flex-direction: column;
+  @apply flex flex-col;
   height: calc(100vh - 140px);
 }
 
 .fx-chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 4px 4px 16px;
+  @apply flex flex-1 flex-col gap-3 overflow-y-auto px-1 pb-4 pt-1;
 }
 
 .fx-chat-bubble {
-  max-width: 65%;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 0.92rem;
-  line-height: 1.4;
+  @apply max-w-[65%] rounded-2xl px-3.5 py-2.5 text-[0.92rem] leading-[1.4];
 }
 
 .fx-chat-bubble.fx-chat-bot {
-  align-self: flex-start;
+  @apply self-start rounded-bl border;
   background: var(--fx-surface);
-  border: 1px solid var(--fx-border);
-  border-bottom-left-radius: 4px;
+  border-color: var(--fx-border);
 }
 
 .fx-chat-bubble.fx-chat-user {
-  align-self: flex-end;
+  @apply self-end rounded-br text-white;
   background: var(--fx-accent);
-  color: #ffffff;
-  border-bottom-right-radius: 4px;
 }
 
 .fx-chat-input-row {
-  display: flex;
-  gap: 10px;
-  border-top: 1px solid var(--fx-border);
-  padding-top: 14px;
+  @apply flex gap-2.5 border-t pt-3.5;
+  border-color: var(--fx-border);
 }
 
 .fx-chat-input-row input {
-  flex: 1;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--fx-border);
+  @apply flex-1 rounded-[10px] border px-3.5 py-2.5 text-[0.92rem];
+  border-color: var(--fx-border);
   background: var(--fx-surface);
-  font-size: 0.92rem;
 }
 
 /* ---------- Rental status stepper ---------- */
 
 .fx-status-steps {
-  display: flex;
-  align-items: flex-start;
-  margin-top: 18px;
-  padding-top: 4px;
+  @apply mt-[18px] flex items-start pt-1;
 }
 
 .fx-status-step {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-  position: relative;
+  @apply relative flex flex-1 flex-col items-center gap-1.5 text-center;
 }
 
 .fx-status-step::before {
   content: '';
-  position: absolute;
-  top: 6px;
-  left: -50%;
-  width: 100%;
-  height: 2px;
+  @apply absolute left-[-50%] top-1.5 z-0 h-0.5 w-full;
   background: var(--fx-border);
-  z-index: 0;
 }
 
 .fx-status-step:first-child::before {
@@ -667,11 +466,8 @@
 }
 
 .fx-status-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  @apply z-[1] h-3.5 w-3.5 rounded-full;
   background: var(--fx-border);
-  z-index: 1;
 }
 
 .fx-status-step.fx-status-step-done .fx-status-dot {
@@ -679,80 +475,65 @@
 }
 
 .fx-status-label {
-  font-size: 0.75rem;
+  @apply text-[0.75rem];
   color: var(--fx-text-muted);
 }
 
 .fx-status-step.fx-status-step-done .fx-status-label {
+  @apply font-semibold;
   color: var(--fx-accent-dark);
-  font-weight: 600;
 }
 
 /* ---------- Overview / table ---------- */
 
 .fx-table {
-  width: 100%;
-  border-collapse: collapse;
+  @apply w-full border-collapse;
 }
 
 .fx-table th,
 .fx-table td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--fx-border);
-  font-size: 0.9rem;
+  @apply border-b px-3 py-2.5 text-left text-[0.9rem];
+  border-color: var(--fx-border);
 }
 
 .fx-table th {
+  @apply font-semibold;
   color: var(--fx-text-muted);
-  font-weight: 600;
 }
 
 /* ---------- Edit form ---------- */
 
 .fx-edit-layout {
-  display: grid;
+  @apply grid items-start gap-5;
   grid-template-columns: 260px 1fr;
-  gap: 20px;
-  align-items: start;
 }
 
 .fx-edit-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  @apply flex flex-col gap-1.5;
 }
 
 .fx-edit-list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--fx-border);
+  @apply flex cursor-pointer items-center justify-between rounded-[10px] border px-3 py-2.5 text-[0.88rem];
+  border-color: var(--fx-border);
   background: var(--fx-surface);
-  cursor: pointer;
-  font-size: 0.88rem;
 }
 
 .fx-edit-list-item.active {
+  @apply font-semibold;
   border-color: var(--fx-accent);
   background: var(--fx-accent-soft);
   color: var(--fx-accent-dark);
-  font-weight: 600;
 }
 
 @media (max-width: 720px) {
   .fx-shell {
-    flex-direction: column;
+    @apply flex-col;
   }
   .fx-sidebar {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
+    @apply w-full flex-row overflow-x-auto;
   }
   .fx-nav-spacer {
-    display: none;
+    @apply hidden;
   }
   .fx-edit-layout {
     grid-template-columns: 1fr;
