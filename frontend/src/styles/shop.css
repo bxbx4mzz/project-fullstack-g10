@@ -1,0 +1,508 @@
+@import "tailwindcss";
+
+.fx-app {
+  --fx-bg: #faf6ee;
+  --fx-surface: #ffffff;
+  --fx-surface-soft: #fbf3e1;
+  --fx-text: #3f3a34;
+  --fx-text-muted: #948b7d;
+  --fx-border: #ece3d3;
+  --fx-accent: #cda15a;
+  --fx-accent-dark: #b5863f;
+  --fx-accent-soft: #f6e9cf;
+  --fx-danger: #d9534f;
+
+  @apply min-h-screen bg-[#f1ebdd] text-[var(--fx-text)];
+  font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.fx-app * {
+  @apply box-border;
+}
+
+.fx-app a {
+  @apply text-inherit;
+}
+
+.fx-shell {
+  @apply flex min-h-screen bg-[var(--fx-bg)];
+}
+
+.fx-sidebar {
+  @apply sticky top-0 flex h-screen w-[220px] shrink-0 flex-col gap-1.5 border-r px-3.5 py-5;
+  background: var(--fx-surface);
+  border-color: var(--fx-border);
+}
+
+.fx-main {
+  @apply flex min-w-0 flex-1 justify-center;
+}
+
+.fx-sidebar-brand {
+  @apply px-2.5 pb-4 pt-1.5 text-[1.05rem] font-bold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-user-card {
+  @apply mb-2.5 flex items-center gap-2.5 rounded-xl p-2.5;
+  background: var(--fx-surface-soft);
+}
+
+.fx-user-avatar {
+  @apply h-9 w-9 shrink-0 rounded-full;
+}
+
+.fx-user-name {
+  @apply text-[0.85rem] font-semibold leading-tight;
+}
+
+.fx-user-badge {
+  @apply mt-0.5 inline-block rounded-full px-2 py-px text-[0.72rem] font-semibold;
+  background: var(--fx-accent-soft);
+  color: var(--fx-accent-dark);
+}
+
+.fx-nav-item {
+  @apply flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] border-none bg-transparent px-3 py-2.5 text-left text-[0.92rem] font-medium no-underline;
+  color: var(--fx-text);
+}
+
+.fx-nav-item:hover {
+  background: var(--fx-surface-soft);
+}
+
+.fx-nav-item.active {
+  @apply font-bold;
+  background: var(--fx-accent-soft);
+  color: var(--fx-accent-dark);
+}
+
+.fx-nav-spacer {
+  @apply flex-1;
+}
+
+.fx-content {
+  @apply w-full max-w-[1000px] px-10 py-8;
+}
+
+.fx-content h1 {
+  @apply m-0 mb-1 text-[1.4rem];
+}
+
+.fx-content .fx-page-subtitle {
+  @apply m-0 mb-5;
+  color: var(--fx-text-muted);
+}
+
+.fx-card {
+  @apply rounded-[14px] border p-5;
+  background: var(--fx-surface);
+  border-color: var(--fx-border);
+}
+
+.fx-btn {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-[10px] border px-[18px] py-2.5 text-[0.92rem] font-semibold text-white no-underline;
+  border-color: var(--fx-accent);
+  background: var(--fx-accent);
+}
+
+.fx-btn:hover {
+  background: var(--fx-accent-dark);
+  border-color: var(--fx-accent-dark);
+}
+
+.fx-btn.fx-btn-ghost {
+  @apply bg-transparent;
+  color: var(--fx-accent-dark);
+}
+
+.fx-btn.fx-btn-ghost:hover {
+  background: var(--fx-accent-soft);
+}
+
+.fx-btn.fx-btn-danger {
+  background: var(--fx-danger);
+  border-color: var(--fx-danger);
+}
+
+.fx-field {
+  @apply mt-4 text-left;
+}
+
+.fx-field label {
+  @apply mb-1.5 block text-[0.85rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-field input {
+  @apply w-full rounded-lg border px-3 py-2.5 text-[0.95rem];
+  border-color: var(--fx-border);
+  background: var(--fx-bg);
+  color: var(--fx-text);
+}
+
+.fx-field input:focus {
+  outline: 2px solid var(--fx-accent);
+  outline-offset: 1px;
+}
+
+.fx-modal-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-5;
+  background: rgba(63, 58, 52, 0.45);
+}
+
+.fx-modal-card {
+  @apply relative max-h-[90vh] w-full max-w-[400px] overflow-y-auto rounded-2xl px-6 py-7;
+  background: var(--fx-surface);
+}
+
+.fx-modal-close {
+  @apply absolute right-3.5 top-3.5 h-[30px] w-[30px] cursor-pointer rounded-full border;
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+  color: var(--fx-text-muted);
+}
+
+.fx-detail-row {
+  @apply mt-3 flex items-center gap-2.5 text-[0.9rem];
+}
+
+.fx-detail-label {
+  @apply min-w-[70px];
+  color: var(--fx-text-muted);
+}
+
+.fx-tag-row {
+  @apply flex flex-wrap gap-1.5;
+}
+
+.fx-tag {
+  @apply rounded-full border px-2.5 py-0.5 text-[0.8rem];
+  background: var(--fx-surface-soft);
+  border-color: var(--fx-border);
+}
+
+.fx-chip {
+  @apply cursor-pointer rounded-full border px-3.5 py-1.5 text-[0.85rem];
+  background: var(--fx-surface-soft);
+  border-color: var(--fx-border);
+  color: var(--fx-text);
+}
+
+.fx-chip.active {
+  @apply font-semibold text-white;
+  background: var(--fx-accent);
+  border-color: var(--fx-accent);
+}
+
+.fx-favorite-btn {
+  @apply w-10 cursor-pointer rounded-lg border text-base;
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-favorite-btn.active {
+  border-color: var(--fx-accent);
+  background: var(--fx-accent-soft);
+}
+
+.fx-modal-card select {
+  @apply w-full rounded-lg border px-3 py-2.5 text-[0.95rem];
+  border-color: var(--fx-border);
+  background: var(--fx-bg);
+  color: var(--fx-text);
+}
+
+.fx-search-input {
+  @apply mb-[18px] w-full max-w-[360px] rounded-[10px] border px-3.5 py-2.5 font-[inherit] text-[0.92rem];
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+  color: var(--fx-text);
+}
+
+.fx-search-input:focus {
+  outline: 2px solid var(--fx-accent);
+  outline-offset: 1px;
+}
+
+.fx-banner {
+  @apply mb-[22px] flex items-center justify-between rounded-2xl border px-7 py-[22px];
+  background: var(--fx-accent-soft);
+  border-color: var(--fx-accent);
+}
+
+.fx-banner h2 {
+  @apply m-0 text-2xl;
+  color: var(--fx-accent-dark);
+}
+
+.fx-banner p {
+  @apply mb-0 mt-1;
+  color: var(--fx-text-muted);
+}
+
+.fx-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.fx-product {
+  @apply flex flex-col gap-2 rounded-[14px] border p-3.5;
+  background: var(--fx-surface);
+  border-color: var(--fx-border);
+}
+
+.fx-product-thumb {
+  @apply flex h-[110px] items-center justify-center rounded-[10px] text-[2.2rem];
+  background: var(--fx-surface-soft);
+}
+
+.fx-product-name {
+  @apply text-[0.92rem] font-semibold;
+}
+
+.fx-product-price {
+  @apply font-bold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-product-actions {
+  @apply mt-auto flex gap-1.5;
+}
+
+.fx-product-actions .fx-btn {
+  @apply flex-1 px-2.5 py-2 text-[0.82rem];
+}
+
+.fx-cal-head {
+  @apply mb-3.5 flex items-center justify-between;
+}
+
+.fx-cal-grid {
+  @apply grid grid-cols-7 gap-1.5;
+}
+
+.fx-cal-dow {
+  @apply pb-1.5 text-center text-[0.8rem] font-semibold;
+  color: var(--fx-text-muted);
+}
+
+.fx-cal-day {
+  @apply flex aspect-square cursor-pointer items-center justify-center rounded-[10px] border text-[0.88rem];
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-cal-day.fx-cal-muted {
+  @apply opacity-50;
+  color: var(--fx-text-muted);
+}
+
+.fx-cal-day.fx-cal-booked {
+  @apply font-bold;
+  background: var(--fx-accent-soft);
+  border-color: var(--fx-accent);
+  color: var(--fx-accent-dark);
+}
+
+.fx-cal-day.fx-cal-today {
+  @apply border-2;
+  border-color: var(--fx-accent-dark);
+}
+
+.fx-cart-item {
+  @apply flex items-center gap-3.5 border-b py-3;
+  border-color: var(--fx-border);
+}
+
+.fx-cart-item:last-child {
+  @apply border-b-0;
+}
+
+.fx-cart-thumb {
+  @apply flex h-14 w-14 shrink-0 items-center justify-center rounded-[10px] text-xl;
+  background: var(--fx-surface-soft);
+}
+
+.fx-cart-info {
+  @apply flex-1;
+}
+
+.fx-cart-info .fx-product-name {
+  @apply m-0;
+}
+
+.fx-cart-qty {
+  @apply flex items-center gap-2;
+}
+
+.fx-cart-qty button {
+  @apply h-[26px] w-[26px] cursor-pointer rounded-md border;
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-cart-summary {
+  @apply flex justify-between py-2 text-[0.92rem];
+}
+
+.fx-cart-summary.fx-cart-total {
+  @apply mt-2 border-t pt-3.5 text-[1.05rem] font-bold;
+  border-color: var(--fx-border);
+}
+
+.fx-payment-card {
+  @apply mx-auto max-w-[340px] text-center;
+}
+
+.fx-qr {
+  @apply mx-auto my-4 h-[200px] w-[200px] rounded-xl border opacity-85;
+  border-color: var(--fx-border);
+  background: repeating-linear-gradient(
+      45deg,
+      var(--fx-text) 0 4px,
+      transparent 4px 8px
+    )
+    0 0 / 100% 100%;
+}
+
+.fx-payment-amount {
+  @apply my-2 mb-5 text-[1.8rem] font-bold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-payment-actions {
+  @apply flex gap-2.5;
+}
+
+.fx-payment-actions .fx-btn {
+  @apply flex-1;
+}
+
+.fx-chat {
+  @apply flex flex-col;
+  height: calc(100vh - 140px);
+}
+
+.fx-chat-messages {
+  @apply flex flex-1 flex-col gap-3 overflow-y-auto px-1 pb-4 pt-1;
+}
+
+.fx-chat-bubble {
+  @apply max-w-[65%] rounded-2xl px-3.5 py-2.5 text-[0.92rem] leading-[1.4];
+}
+
+.fx-chat-bubble.fx-chat-bot {
+  @apply self-start rounded-bl border;
+  background: var(--fx-surface);
+  border-color: var(--fx-border);
+}
+
+.fx-chat-bubble.fx-chat-user {
+  @apply self-end rounded-br text-white;
+  background: var(--fx-accent);
+}
+
+.fx-chat-input-row {
+  @apply flex gap-2.5 border-t pt-3.5;
+  border-color: var(--fx-border);
+}
+
+.fx-chat-input-row input {
+  @apply flex-1 rounded-[10px] border px-3.5 py-2.5 text-[0.92rem];
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-status-steps {
+  @apply mt-[18px] flex items-start pt-1;
+}
+
+.fx-status-step {
+  @apply relative flex flex-1 flex-col items-center gap-1.5 text-center;
+}
+
+.fx-status-step::before {
+  content: '';
+  @apply absolute left-[-50%] top-1.5 z-0 h-0.5 w-full;
+  background: var(--fx-border);
+}
+
+.fx-status-step:first-child::before {
+  content: none;
+}
+
+.fx-status-step.fx-status-step-done::before {
+  background: var(--fx-accent);
+}
+
+.fx-status-dot {
+  @apply z-[1] h-3.5 w-3.5 rounded-full;
+  background: var(--fx-border);
+}
+
+.fx-status-step.fx-status-step-done .fx-status-dot {
+  background: var(--fx-accent);
+}
+
+.fx-status-label {
+  @apply text-[0.75rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-status-step.fx-status-step-done .fx-status-label {
+  @apply font-semibold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-table {
+  @apply w-full border-collapse;
+}
+
+.fx-table th,
+.fx-table td {
+  @apply border-b px-3 py-2.5 text-left text-[0.9rem];
+  border-color: var(--fx-border);
+}
+
+.fx-table th {
+  @apply font-semibold;
+  color: var(--fx-text-muted);
+}
+
+.fx-edit-layout {
+  @apply grid items-start gap-5;
+  grid-template-columns: 260px 1fr;
+}
+
+.fx-edit-list {
+  @apply flex flex-col gap-1.5;
+}
+
+.fx-edit-list-item {
+  @apply flex cursor-pointer items-center justify-between rounded-[10px] border px-3 py-2.5 text-[0.88rem];
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-edit-list-item.active {
+  @apply font-semibold;
+  border-color: var(--fx-accent);
+  background: var(--fx-accent-soft);
+  color: var(--fx-accent-dark);
+}
+
+@media (max-width: 720px) {
+  .fx-shell {
+    @apply flex-col;
+  }
+  .fx-sidebar {
+    @apply w-full flex-row overflow-x-auto;
+  }
+  .fx-nav-spacer {
+    @apply hidden;
+  }
+  .fx-edit-layout {
+    grid-template-columns: 1fr;
+  }
+}
