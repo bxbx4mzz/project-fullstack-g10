@@ -97,7 +97,6 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
       setCopiedId(order.id)
       setTimeout(() => setCopiedId(null), 2000)
     } catch {
-      // clipboard access not available — user can select the text manually
     }
   }
 

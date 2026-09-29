@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/** Ported from branch backemd-customer (entity/ProductVariant.java). */
 @Entity
 @Table(name = "product_variants")
 @Getter

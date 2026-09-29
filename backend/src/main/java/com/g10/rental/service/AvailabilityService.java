@@ -14,12 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Ported from branch backemd-customer (service/AvailabilityService.java).
- * A variant is "full" once booked quantity in an overlapping date range reaches its stock —
- * RETURN_BUFFER_DAYS pads every booking's return date to keep the next renter's package from
- * crossing in transit (see API-SPEC.md "การเช็คของว่าง").
- */
 @Service
 @RequiredArgsConstructor
 public class AvailabilityService {

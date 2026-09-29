@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/** Ported from branch backemd-customer (dto/product/CreateProductVariantRequest.java). */
 @Getter
 @Setter
 public class CreateProductVariantRequest {

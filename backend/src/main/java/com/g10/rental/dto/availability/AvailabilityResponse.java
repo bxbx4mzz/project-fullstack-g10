@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-/** Ported from branch backemd-customer (dto/availability/AvailabilityResponse.java). */
 @Getter
 @Builder
 @AllArgsConstructor

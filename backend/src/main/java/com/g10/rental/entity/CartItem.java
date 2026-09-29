@@ -3,7 +3,6 @@ package com.g10.rental.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-/** Ported from branch backemd-customer (entity/CartItem.java). */
 @Entity
 @Table(
     name = "cart_items",

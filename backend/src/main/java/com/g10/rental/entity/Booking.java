@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Ported from branch backemd-customer (entity/Booking.java), plus a `source`
- * field (see BookingSource) to support staff-recorded in-store bookings.
- */
 @Entity
 @Table(name = "bookings")
 @Getter
@@ -29,7 +25,6 @@ public class Booking {
     @Column(nullable = false, unique = true)
     private String code;
 
-    /** Nullable for in-store bookings recorded by staff without a customer account. */
     private Long customerId;
 
     @Column(nullable = false)

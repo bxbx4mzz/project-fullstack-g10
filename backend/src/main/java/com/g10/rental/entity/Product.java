@@ -9,10 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.*;
 
-/**
- * Ported from branch backemd-customer (rental/src/main/java/com/g10/rental/entity/Product.java)
- * — package changed from `entity` to `model` to match this app's existing convention.
- */
 @Entity
 @Table(name = "products")
 @Getter

@@ -7,12 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-/**
- * Ported from branch backemd-customer (exception/GlobalExceptionHandler.java), extended to also
- * map the plain RuntimeException("...") the ported cart/booking/availability services throw
- * (e.g. "Cart is empty", "Not enough variant stock") to 400 with the message intact, instead of
- * letting them fall through to a bare 500.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

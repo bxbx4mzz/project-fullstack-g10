@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/** Ported from branch backemd-customer (dto/booking/CreateBookingRequest.java). Checks out the current user's cart. */
 @Getter
 @Setter
 public class CreateBookingRequest {

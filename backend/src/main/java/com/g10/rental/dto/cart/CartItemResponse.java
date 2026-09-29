@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
-/** Ported from branch backemd-customer (dto/cart/CartItemResponse.java). */
 @Getter
 @Builder
 public class CartItemResponse {

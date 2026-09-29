@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/** Ported from branch backemd-customer (service/ProductVariantService.java). */
 @Service
 @RequiredArgsConstructor
 public class ProductVariantService {

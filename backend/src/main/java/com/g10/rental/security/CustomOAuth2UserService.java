@@ -14,12 +14,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Runs after Google returns the user's profile. Upserts a {@link User} row
- * and decides the role: existing users keep their current role (an admin
- * may have promoted them via the admin panel later on); brand new users get
- * ADMIN/STAFF only if their email is in the whitelist, otherwise CUSTOMER.
- */
 @Service
 public class CustomOAuth2UserService extends OidcUserService {
 

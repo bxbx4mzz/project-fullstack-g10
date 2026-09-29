@@ -13,10 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Ported from branch backemd-customer (dto/booking/BookingResponse.java), plus `source`
- * (ONLINE/IN_STORE — see BookingSource) so the frontend can label walk-in bookings.
- */
 @Getter
 @Builder
 @AllArgsConstructor

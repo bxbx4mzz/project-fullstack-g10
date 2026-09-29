@@ -27,12 +27,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Ported from branch backemd-customer (service/BookingService.java) — creates a booking from the
- * signed-in customer's cart. Staff/admin in-store bookings (no cart, direct item list) are handled
- * separately by {@link StaffBookingService}; both share {@link #calculateRentalPrice} and
- * {@link #toResponse} via package-private helpers below.
- */
 @Service
 @RequiredArgsConstructor
 public class BookingService {
@@ -75,7 +69,6 @@ public class BookingService {
             ProductVariant variant = cartItem.getVariant();
             int quantity = cartItem.getQuantity();
 
-            // Re-check availability at checkout; cart-time availability can be stale.
             var availability = availabilityService.checkAvailability(
                     variant.getId(), request.getRentDate(), request.getReturnDate());
 
@@ -148,10 +141,6 @@ public class BookingService {
         }
     }
 
-    /**
-     * 3 days -> price3Day, 5 days -> price5Day, 7 days -> price7Day,
-     * more -> price7Day + extraDayPrice per day beyond 7 (inclusive day count).
-     */
     static BigDecimal calculateRentalPrice(ProductVariant variant, LocalDate rentDate, LocalDate returnDate) {
         long rentalDays = ChronoUnit.DAYS.between(rentDate, returnDate) + 1;
 

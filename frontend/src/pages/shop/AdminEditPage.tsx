@@ -43,15 +43,12 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
   const [deleting, setDeleting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
-  // Products load asynchronously — pick the URL's ?id= (or the first product) once they arrive,
-  // and again whenever the currently active product disappears (e.g. after a delete).
   useEffect(() => {
     if (products.length === 0) return
     if (products.some((p) => p.id === activeId)) return
 
     const fromUrl = products.find((p) => p.id === idFromUrl)
     selectProduct((fromUrl ?? products[0]).id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products])
 
   function selectProduct(id: number) {

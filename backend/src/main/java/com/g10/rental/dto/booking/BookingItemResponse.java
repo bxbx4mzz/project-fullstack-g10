@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
-/** Ported from branch backemd-customer (dto/booking/BookingItemResponse.java). */
 @Getter
 @Builder
 @AllArgsConstructor

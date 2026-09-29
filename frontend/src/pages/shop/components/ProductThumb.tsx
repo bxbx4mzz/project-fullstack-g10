@@ -8,7 +8,6 @@ function looksLikeImage(icon: string): boolean {
   return icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('data:image')
 }
 
-/** Renders a product's `icon` field as a real <img> when it's a URL/data URI, or as emoji text otherwise. */
 export function ProductThumb({ icon, className = 'fx-product-thumb', style }: ProductThumbProps) {
   if (looksLikeImage(icon)) {
     return (

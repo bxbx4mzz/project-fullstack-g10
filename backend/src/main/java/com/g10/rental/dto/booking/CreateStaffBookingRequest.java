@@ -12,17 +12,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * New — not in either source branch. Lets STAFF/ADMIN record a booking directly (no cart), for a
- * walk-in customer who is buying/renting at the store (see API-SPEC.md "in-store booking").
- */
 @Getter
 @Setter
 public class CreateStaffBookingRequest {
     @NotBlank
     private String customerName;
 
-    /** Optional for a walk-in — defaults to "รับที่ร้าน" in the service if left blank. */
     private String shippingAddress;
 
     @NotNull

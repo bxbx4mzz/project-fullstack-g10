@@ -44,8 +44,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // API ใช้ session cookie (SameSite=Lax) เรียกจาก frontend คนละ origin ในโหมด dev
-                // เท่านั้น จึงปิด CSRF ไว้ก่อน (ไม่มีฟอร์ม server-rendered ที่ต้องป้องกัน)
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth

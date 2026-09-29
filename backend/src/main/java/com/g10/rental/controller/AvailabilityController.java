@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-/** Ported from branch backemd-customer (controller/AvailabilityController.java). */
 @RestController
 @RequestMapping("/api/variants")
 @RequiredArgsConstructor

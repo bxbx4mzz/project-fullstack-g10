@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Ported from branch backemd-customer (dto/cart/CartResponse.java). */
 @Getter
 @Builder
 public class CartResponse {

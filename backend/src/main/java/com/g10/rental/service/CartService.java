@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Ported from branch backemd-customer (service/CartService.java). */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -150,7 +149,6 @@ public class CartService {
         Product product = productRepository.findById(variant.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Short-term (3-day) price for display; checkout recalculates from rentDate/returnDate.
         BigDecimal price = variant.getPrice3Day();
         BigDecimal subtotal = price.multiply(BigDecimal.valueOf(item.getQuantity()));
 

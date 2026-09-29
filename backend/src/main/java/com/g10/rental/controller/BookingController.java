@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/** Ported from branch backemd-customer (controller/BookingController.java). Customer-facing checkout. */
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor

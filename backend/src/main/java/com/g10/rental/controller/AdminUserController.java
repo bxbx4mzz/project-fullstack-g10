@@ -7,7 +7,6 @@ import com.g10.rental.security.CustomOAuth2User;
 import com.g10.rental.dto.user.UpdateRoleRequest;
 import com.g10.rental.dto.user.UserResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,9 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-/**
- * ให้ ADMIN ดูรายชื่อผู้ใช้ทั้งหมดและมอบ/ถอน role (CUSTOMER / STAFF / ADMIN) ได้
- */
 @RestController
 @RequestMapping("/api/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
