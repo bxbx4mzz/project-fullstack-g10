@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f1ebdd;
+  --surface: #ffffff;
+  --text: #3f3a34;
+  --text-muted: #948b7d;
+  --border: #ece3d3;
+  --primary: #cda15a;
+  --primary-text: #ffffff;
+  --danger: #d9534f;
+  --badge-bg: #f6e9cf;
+  --badge-text: #b5863f;
+}
+
+* {
+  @apply box-border;
+}
+
+body {
+  @apply m-0 bg-[var(--bg)] text-[var(--text)];
+  font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.page-center {
+  @apply min-h-screen flex flex-col items-center justify-center gap-4 p-4;
+}
+
+.page {
+  @apply min-h-screen;
+}
+
+.page-content {
+  @apply mx-auto flex max-w-[720px] flex-col gap-4 px-4 py-6;
+}
+
+.topbar {
+  @apply flex items-center justify-between border-b px-6 py-4;
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.topbar-actions {
+  @apply flex items-center gap-3;
+}
+
+.brand {
+  @apply text-[1.1rem] font-bold;
+}
+
+.card {
+  @apply rounded-xl border p-6;
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.login-card {
+  @apply w-full max-w-[420px] text-center;
+}
+
+.login-card h1 {
+  @apply m-0 whitespace-nowrap text-2xl font-bold;
+}
+
+.subtitle {
+  @apply mt-1;
+  color: var(--text-muted);
+}
+
+.error-text {
+  @apply text-[0.9rem];
+  color: var(--danger);
+}
+
+.google-btn {
+  @apply mt-5 inline-flex w-full items-center justify-center gap-2.5 rounded-lg border py-3 px-5 font-semibold no-underline;
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.google-btn:hover {
+  background: var(--bg);
+}
+
+.ghost-btn {
+  @apply cursor-pointer rounded-lg border bg-transparent px-3.5 py-2 text-[0.9rem] no-underline;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.ghost-btn:hover {
+  background: var(--bg);
+}
+
+.profile-row {
+  @apply flex items-center gap-4;
+}
+
+.avatar {
+  @apply h-14 w-14 rounded-full;
+}
+
+.badge {
+  @apply mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-[0.8rem] font-semibold;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+}

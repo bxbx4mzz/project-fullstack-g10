@@ -1,0 +1,15 @@
+name: g10
+
+services:
+  frontend:
+    container_name: pj-frontend
+    build: .
+    ports:
+      - ${NGINX_PORT}:6000
+    networks:
+      - project_pj-net
+    environment:
+      - NGINX_PROXY=${NGINX_PROXY}
+networks:
+  project_pj-net: # Check by using `docker network ls` command
+    external: true
