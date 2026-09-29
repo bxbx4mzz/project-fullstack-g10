@@ -11,13 +11,6 @@ import {
   type CreateProductVariantInput,
 } from '../../../lib/api'
 
-/**
- * Products and favorites are backed by the real backend (ported from branch
- * backemd-customer — see API-SPEC.md and backend/src/main/java/com/g10/rental/controller/).
- * Cart and bookings are NOT kept here — they're server-owned (see lib/api.ts
- * fetchCart/fetchMyBookings/fetchStaffBookings) and pages fetch them directly.
- */
-
 export type Product = {
   id: number
   name: string
@@ -28,7 +21,6 @@ export type Product = {
   icon: string
   sizes: string[]
   colors: string[]
-  /** Real variant rows (with their DB ids) — needed to add a specific variant to a cart/booking. */
   variants: ApiProductVariant[]
 }
 
@@ -86,7 +78,6 @@ export async function refreshProducts(): Promise<void> {
   await loadProductsFromApi()
 }
 
-/** Call from a page's useEffect to make sure products have been fetched at least once. */
 export function useEnsureProductsLoaded() {
   useEffect(() => {
     if (productsLoaded || productsLoadingPromise) return
@@ -118,7 +109,6 @@ async function loadFavoritesFromApi(): Promise<void> {
   }
 }
 
-/** Call from a page's useEffect to make sure favorites have been fetched at least once. */
 export function useEnsureFavoritesLoaded() {
   useEffect(() => {
     if (favoritesLoaded || favoritesLoadingPromise) return
@@ -162,12 +152,6 @@ export type NewProductInput = {
   colors: string[]
 }
 
-/**
- * Creates the product on the real backend, splitting stock evenly across one variant per
- * size (all sharing the first color entered — the Add Product form doesn't yet support
- * picking a color per size). Tier pricing is a flat price×3/×5/×7 since the form only
- * collects one price-per-day figure; edit variants individually later for real tiering.
- */
 export async function addProduct(input: NewProductInput): Promise<Product> {
   const sizes = input.sizes.length > 0 ? input.sizes : ['Free Size']
   const color = input.colors[0] ?? '-'
@@ -224,7 +208,6 @@ export function addCategory(category: string) {
 export async function toggleFavorite(productId: number): Promise<void> {
   const isFavorite = favorites.includes(productId)
 
-  // optimistic update
   favorites = isFavorite ? favorites.filter((id) => id !== productId) : [...favorites, productId]
   emitChange()
 
@@ -235,7 +218,6 @@ export async function toggleFavorite(productId: number): Promise<void> {
       await apiAddFavorite(productId)
     }
   } catch {
-    // request failed — revert the optimistic update
     favorites = isFavorite ? [...favorites, productId] : favorites.filter((id) => id !== productId)
     emitChange()
   }

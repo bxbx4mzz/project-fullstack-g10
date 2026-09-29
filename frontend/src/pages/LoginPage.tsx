@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
 import { googleLoginUrl, homePathForRole } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
-import { ThemeToggle } from '../components/ThemeToggle'
 
 export function LoginPage() {
   const { user, loading } = useAuth()
@@ -23,7 +22,6 @@ export function LoginPage() {
 
   return (
     <div className="page-center">
-      <ThemeToggle />
       <div className="card login-card">
         <h1>Clothing Rental Shop</h1>
 

@@ -10,10 +10,8 @@ export interface CurrentUser {
   role: Role
 }
 
-/** ลิงก์ให้ปุ่ม "เข้าสู่ระบบด้วย Google" ชี้ไป — เริ่ม OAuth2 flow ฝั่ง backend */
 export const googleLoginUrl = `${API_BASE_URL}/oauth2/authorization/google`
 
-/** หน้าแรกหลัง login ของแต่ละ role */
 export function homePathForRole(role: Role): string {
   if (role === 'ADMIN') return '/admin-panel'
   if (role === 'STAFF') return '/staff-panel'
@@ -37,7 +35,6 @@ export async function logout(): Promise<void> {
   if (!res.ok) throw new Error(`ออกจากระบบไม่สำเร็จ (${res.status})`)
 }
 
-/** ADMIN เท่านั้น: ดูรายชื่อผู้ใช้ทั้งหมด */
 export async function listUsers(): Promise<CurrentUser[]> {
   const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
     credentials: 'include',
@@ -46,7 +43,6 @@ export async function listUsers(): Promise<CurrentUser[]> {
   return (await res.json()) as CurrentUser[]
 }
 
-/** ADMIN เท่านั้น: มอบ/ถอน role ให้ผู้ใช้คนหนึ่ง */
 export async function updateUserRole(id: number, role: Role): Promise<CurrentUser> {
   const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/role`, {
     method: 'PATCH',
@@ -60,11 +56,6 @@ export async function updateUserRole(id: number, role: Role): Promise<CurrentUse
   }
   return (await res.json()) as CurrentUser
 }
-
-// ---------------------------------------------------------------------------
-// Products & variants (real backend — ported from branch backemd-customer,
-// see backend/src/main/java/com/g10/rental/web/ProductController.java)
-// ---------------------------------------------------------------------------
 
 export interface ApiProduct {
   id: number
@@ -145,14 +136,9 @@ export function deleteProduct(id: number): Promise<void> {
   return apiFetch(`/api/products/${id}`, { method: 'DELETE' })
 }
 
-/** ADMIN เท่านั้น: ลบผู้ใช้ */
 export function deleteUser(id: number): Promise<void> {
   return apiFetch(`/api/admin/users/${id}`, { method: 'DELETE' })
 }
-
-// ---------------------------------------------------------------------------
-// Availability (real backend — ported from branch backemd-customer)
-// ---------------------------------------------------------------------------
 
 export interface ApiAvailability {
   variantId: number
@@ -165,10 +151,6 @@ export interface ApiAvailability {
 export function checkAvailability(variantId: number, startDate: string, endDate: string): Promise<ApiAvailability> {
   return apiFetch(`/api/variants/${variantId}/availability?startDate=${startDate}&endDate=${endDate}`)
 }
-
-// ---------------------------------------------------------------------------
-// Cart (real backend — customer's own cart, ported from branch backemd-customer)
-// ---------------------------------------------------------------------------
 
 export interface ApiCartItem {
   id: number
@@ -207,10 +189,6 @@ export function removeCartItem(itemId: number): Promise<ApiCart> {
   return apiFetch(`/api/cart/items/${itemId}`, { method: 'DELETE' })
 }
 
-// ---------------------------------------------------------------------------
-// Favorites (real backend — ported from branch backemd-customer FavoriteController)
-// ---------------------------------------------------------------------------
-
 export interface ApiFavorite {
   id: number
   productId: number
@@ -233,11 +211,6 @@ export function addFavorite(productId: number): Promise<void> {
 export function removeFavorite(productId: number): Promise<void> {
   return apiFetch(`/api/favorites/${productId}`, { method: 'DELETE' })
 }
-
-// ---------------------------------------------------------------------------
-// Bookings — customer checkout + staff/admin management (real backend, ported
-// from branch backemd-customer + new StaffBookingController)
-// ---------------------------------------------------------------------------
 
 export type ShippingMethod = 'EMS' | 'MESSENGER' | 'PICKUP'
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'RETURNED' | 'CANCELLED'
@@ -276,7 +249,6 @@ export interface CreateBookingInput {
   shippingMethod: ShippingMethod
 }
 
-/** Checks out the signed-in customer's current cart into a booking. */
 export function createBooking(input: CreateBookingInput): Promise<ApiBooking> {
   return apiFetch('/api/bookings', { method: 'POST', body: JSON.stringify(input) })
 }

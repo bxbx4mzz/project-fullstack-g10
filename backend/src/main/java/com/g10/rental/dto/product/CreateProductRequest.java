@@ -6,7 +6,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Ported from branch backemd-customer (dto/product/CreateProductRequest.java). */
 @Getter
 @Setter
 public class CreateProductRequest {

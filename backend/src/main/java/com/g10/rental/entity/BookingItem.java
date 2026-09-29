@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/** Ported from branch backemd-customer (entity/BookingItem.java). */
 @Entity
 @Table(name = "booking_items")
 @Getter

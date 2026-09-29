@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-/** Ported from branch backemd-customer (entity/Cart.java). */
 @Entity
 @Table(name = "carts")
 @Getter

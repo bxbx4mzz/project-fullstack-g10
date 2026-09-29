@@ -28,16 +28,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-/**
- * New — not in either source branch. Gives STAFF/ADMIN the same booking read/write access the
- * customer-facing BookingController gives customers, plus two things customers can't do:
- * recording a walk-in (in-store) booking directly with an explicit item list (no cart), and
- * moving a booking through its status lifecycle (see API-SPEC.md "Bookings").
- *
- * Reuses BookingService's package-private pricing/code/mapping helpers so both booking paths
- * (online checkout vs staff-recorded) compute the exact same tier price and produce the same
- * response shape.
- */
 @Service
 @RequiredArgsConstructor
 public class StaffBookingService {
@@ -154,12 +144,6 @@ public class StaffBookingService {
         return new DailyTasksResponse(targetDate, toDispatch, toReturn);
     }
 
-    /**
-     * Plain-text order summary for staff to copy/paste to the customer.
-     * Idea ported from branch backend-admin's RentalAdminService#generateChatSummary, adapted to
-     * the Booking/BookingItem entities (variantId lookup instead of RentalItem's direct
-     * Product/ProductVariant relation).
-     */
     @Transactional(readOnly = true)
     public String generateSummaryMessage(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)

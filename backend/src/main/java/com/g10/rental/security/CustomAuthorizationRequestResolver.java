@@ -9,13 +9,6 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Google keeps its own login session in the browser independent of our app's
- * session cookie, so logging out of the app alone leaves the user signed
- * into Google - the next login silently re-authenticates the same account
- * with no account picker. Adding prompt=select_account forces Google to show
- * the account chooser on every login attempt.
- */
 public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
 
     private final DefaultOAuth2AuthorizationRequestResolver defaultResolver;

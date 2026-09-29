@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-/** Ported from branch backemd-customer (service/ProductService.java). */
 @Service
 @RequiredArgsConstructor
 public class ProductService {

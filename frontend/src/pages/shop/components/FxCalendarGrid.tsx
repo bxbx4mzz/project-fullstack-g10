@@ -2,7 +2,7 @@ const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส']
 
 type FxCalendarGridProps = {
   year: number
-  month: number // 0-indexed
+  month: number
   bookedDays?: number[]
   onSelectDay?: (day: number) => void
 }

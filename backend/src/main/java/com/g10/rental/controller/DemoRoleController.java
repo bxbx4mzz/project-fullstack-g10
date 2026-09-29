@@ -6,10 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-/**
- * ตัวอย่างการใช้ @PreAuthorize แยกสิทธิ์ตาม role — ลบ/แก้ไขได้ตามต้องการ
- * เก็บไว้เป็นแนวทางสำหรับ endpoint จริงของแต่ละฝั่ง (Customer / Staff / Admin API)
- */
 @RestController
 public class DemoRoleController {
 

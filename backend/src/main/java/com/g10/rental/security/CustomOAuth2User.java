@@ -11,14 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Wraps our own {@link User} entity so downstream code (controllers,
- * @PreAuthorize checks) can access app-specific fields (id, role, ...)
- * instead of raw Google attributes. Google's registration requests the
- * "openid" scope, so Spring Security authenticates via the OIDC path -
- * this must implement OidcUser (not just OAuth2User) or @AuthenticationPrincipal
- * injection silently fails and every request looks unauthenticated.
- */
 public class CustomOAuth2User implements OidcUser {
 
     private final User user;

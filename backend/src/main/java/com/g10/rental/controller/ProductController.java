@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/** Ported from branch backemd-customer (controller/ProductController.java). */
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor

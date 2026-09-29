@@ -2,7 +2,6 @@ package com.g10.rental.dto.product;
 
 import java.math.BigDecimal;
 
-/** Ported from branch backemd-customer (dto/product/ProductResponse.java). */
 public record ProductResponse(
         Long id,
         String name,

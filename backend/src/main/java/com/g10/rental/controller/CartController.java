@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-/** Ported from branch backemd-customer (controller/CartController.java). Customer's own cart only. */
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor

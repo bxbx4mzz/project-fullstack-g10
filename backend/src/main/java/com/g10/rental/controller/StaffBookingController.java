@@ -18,11 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-/**
- * New — not in either source branch. STAFF/ADMIN booking management, gated by the existing
- * "/api/staff/**" -> hasAnyRole(STAFF, ADMIN) rule already in SecurityConfig (no security changes
- * needed). See API-SPEC.md "Bookings" and "in-store booking".
- */
 @RestController
 @RequestMapping("/api/staff")
 @RequiredArgsConstructor

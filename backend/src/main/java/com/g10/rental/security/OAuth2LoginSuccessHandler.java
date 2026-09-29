@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/**
- * Login สำเร็จ -> session cookie ถูกตั้งค่าแล้วโดย Spring Security
- * -> redirect กลับไปหน้า frontend เพื่อให้ frontend เรียก GET /api/auth/me ต่อ
- */
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 

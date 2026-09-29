@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-/* Scoped styles for the shop/admin UI (Figma: ux-ui-shop) — light cream theme.
-   Everything lives under .fx-app so it never touches the existing global styles. */
-
 .fx-app {
   --fx-bg: #faf6ee;
   --fx-surface: #ffffff;
@@ -26,8 +23,6 @@
 .fx-app a {
   @apply text-inherit;
 }
-
-/* ---------- Layout: sidebar pinned left, content balanced in the remaining space ---------- */
 
 .fx-shell {
   @apply flex min-h-screen bg-[var(--fx-bg)];
@@ -99,8 +94,6 @@
   color: var(--fx-text-muted);
 }
 
-/* ---------- Cards / generic ---------- */
-
 .fx-card {
   @apply rounded-[14px] border p-5;
   background: var(--fx-surface);
@@ -132,8 +125,6 @@
   border-color: var(--fx-danger);
 }
 
-/* ---------- Form fields (used by admin edit) ---------- */
-
 .fx-field {
   @apply mt-4 text-left;
 }
@@ -154,9 +145,6 @@
   outline: 2px solid var(--fx-accent);
   outline-offset: 1px;
 }
-
-
-/* ---------- Modal (product detail / add product) ---------- */
 
 .fx-modal-backdrop {
   @apply fixed inset-0 z-50 flex items-center justify-center p-5;
@@ -225,8 +213,6 @@
   color: var(--fx-text);
 }
 
-/* ---------- Search input ---------- */
-
 .fx-search-input {
   @apply mb-[18px] w-full max-w-[360px] rounded-[10px] border px-3.5 py-2.5 font-[inherit] text-[0.92rem];
   border-color: var(--fx-border);
@@ -238,8 +224,6 @@
   outline: 2px solid var(--fx-accent);
   outline-offset: 1px;
 }
-
-/* ---------- Promo banner ---------- */
 
 .fx-banner {
   @apply mb-[22px] flex items-center justify-between rounded-2xl border px-7 py-[22px];
@@ -257,8 +241,6 @@
   color: var(--fx-text-muted);
 }
 
-/* ---------- Product grid ---------- */
-
 .fx-grid {
   @apply grid gap-4;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -269,7 +251,6 @@
   background: var(--fx-surface);
   border-color: var(--fx-border);
 }
-
 
 .fx-product-thumb {
   @apply flex h-[110px] items-center justify-center rounded-[10px] text-[2.2rem];
@@ -292,8 +273,6 @@
 .fx-product-actions .fx-btn {
   @apply flex-1 px-2.5 py-2 text-[0.82rem];
 }
-
-/* ---------- Calendar ---------- */
 
 .fx-cal-head {
   @apply mb-3.5 flex items-center justify-between;
@@ -330,8 +309,6 @@
   @apply border-2;
   border-color: var(--fx-accent-dark);
 }
-
-/* ---------- Cart ---------- */
 
 .fx-cart-item {
   @apply flex items-center gap-3.5 border-b py-3;
@@ -374,8 +351,6 @@
   border-color: var(--fx-border);
 }
 
-/* ---------- Payment ---------- */
-
 .fx-payment-card {
   @apply mx-auto max-w-[340px] text-center;
 }
@@ -403,8 +378,6 @@
 .fx-payment-actions .fx-btn {
   @apply flex-1;
 }
-
-/* ---------- Chat AI ---------- */
 
 .fx-chat {
   @apply flex flex-col;
@@ -440,8 +413,6 @@
   border-color: var(--fx-border);
   background: var(--fx-surface);
 }
-
-/* ---------- Rental status stepper ---------- */
 
 .fx-status-steps {
   @apply mt-[18px] flex items-start pt-1;
@@ -484,8 +455,6 @@
   color: var(--fx-accent-dark);
 }
 
-/* ---------- Overview / table ---------- */
-
 .fx-table {
   @apply w-full border-collapse;
 }
@@ -500,8 +469,6 @@
   @apply font-semibold;
   color: var(--fx-text-muted);
 }
-
-/* ---------- Edit form ---------- */
 
 .fx-edit-layout {
   @apply grid items-start gap-5;

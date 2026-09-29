@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /**
-     * Frontend เรียก endpoint นี้หลัง redirect กลับจาก Google (หรือตอนโหลดแอปครั้งแรก)
-     * เพื่อเช็คว่ามี session อยู่หรือไม่ และดึง role ของผู้ใช้ปัจจุบัน
-     */
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(@AuthenticationPrincipal CustomOAuth2User principal) {
         if (principal == null) {
@@ -23,6 +19,4 @@ public class AuthController {
         }
         return ResponseEntity.ok(UserResponse.from(principal.getUser()));
     }
-
-    // /api/auth/logout ถูกจัดการโดย Spring Security logout filter (ดู SecurityConfig)
 }
