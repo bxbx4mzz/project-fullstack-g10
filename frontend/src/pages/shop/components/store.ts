@@ -39,7 +39,7 @@ function toStoreProduct(apiProduct: ApiProduct, variants: ApiProductVariant[]): 
   const sizes = uniqueNonEmpty(variants.map((v) => v.size))
   const colors = uniqueNonEmpty(variants.map((v) => v.color))
   const stock = variants.length > 0 ? variants.reduce((sum, v) => sum + v.stockQty, 0) : apiProduct.stock
-  const displayPrice = variants.length > 0 ? variants[0].price3Day : apiProduct.price
+  const displayPrice = apiProduct.price
 
   return {
     id: apiProduct.id,
