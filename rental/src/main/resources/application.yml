@@ -3,9 +3,9 @@ spring:
     name: rental-backend
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/rental}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:1234}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/rental}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
 
   jpa:
     hibernate:
@@ -13,7 +13,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-         '[format_sql]': true
+        format_sql: true
 
   security:
     oauth2:
@@ -27,6 +27,13 @@ spring:
               - profile
               - email
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+  
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY:}
+        chat:
+          model: gemini-3.8-flash
 
 server:
   port: 8080
