@@ -15,20 +15,39 @@ jobs:
     name: Backend Build & Test
     runs-on: ubuntu-latest
 
+    services:
+        postgres:
+          image: postgres:17
+          env:
+            POSTGRES_DB: rental
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+          ports:
+            - 5432:5432
+          options: >-
+            --health-cmd="pg_isready -U postgres -d rental"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=5
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: maven
+        - name: Set up JDK 21
+          uses: actions/setup-java@v5
+          with:
+            java-version: '21'
+            distribution: 'temurin'
+            cache: maven
 
-      - name: Build and test backend
-        working-directory: rental
-        run: ./mvnw clean verify
+        - name: Build and test backend
+          working-directory: rental
+          env:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/rental
+            SPRING_DATASOURCE_USERNAME: postgres
+            SPRING_DATASOURCE_PASSWORD: postgres
+          run: ./mvnw clean verify
 
   frontend:
     name: Frontend Build
