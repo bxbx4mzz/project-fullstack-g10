@@ -21,7 +21,7 @@ jobs:
           env:
             POSTGRES_DB: rental
             POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
           ports:
             - 5432:5432
           options: >-
@@ -46,7 +46,7 @@ jobs:
           env:
             SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/rental
             SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: postgres
+            SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
           run: ./mvnw clean verify
 
   frontend:
