@@ -47,6 +47,8 @@ jobs:
             SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/rental
             SPRING_DATASOURCE_USERNAME: postgres
             SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+            GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }} 
           run: ./mvnw clean verify
 
   frontend:
