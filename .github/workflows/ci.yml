@@ -49,6 +49,7 @@ jobs:
             SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
             GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }} 
+            GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           run: ./mvnw clean verify
 
   frontend:
