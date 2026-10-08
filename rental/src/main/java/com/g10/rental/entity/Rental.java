@@ -1,12 +1,30 @@
 package com.g10.rental.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -21,8 +39,12 @@ public class Rental {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", nullable = true)
+    private Booking booking;
+
     @Column(name = "booking_code", unique = true, nullable = false)
-    private String bookingCode; // เช่น B0007
+    private String bookingCode; 
 
     @Column(name = "customer_name", nullable = false)
     private String customerName;
@@ -38,7 +60,7 @@ public class Rental {
     private DeliveryMethod deliveryMethod;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate; // วันที่ลูกค้าใส่จริง
+    private LocalDate startDate; 
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
@@ -46,7 +68,7 @@ public class Rental {
     @Column(name = "total_days", nullable = false)
     private Integer totalDays;
 
-    // วันที่กันไว้ในระบบจริง (รวมวันเดินทางขนส่ง)
+
     @Column(name = "buffered_start_date", nullable = false)
     private LocalDate bufferedStartDate;
 
@@ -61,7 +83,7 @@ public class Rental {
     private BigDecimal discount = BigDecimal.ZERO;
 
     @Column(name = "net_price", nullable = false)
-    private BigDecimal netPrice; // ยอดสุทธิหลังหักส่วนลด
+    private BigDecimal netPrice; 
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

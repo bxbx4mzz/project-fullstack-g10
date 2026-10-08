@@ -1,9 +1,10 @@
 package com.g10.rental.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,12 +22,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "product_variants")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "product_variants")
 public class ProductVariant {
 
     @Id
@@ -34,31 +36,27 @@ public class ProductVariant {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnore
     private Product product;
 
-    @Column(unique = true, nullable = false)
-    private String sku; // เช่น PRD-0001-BLK-M
+    @Column(nullable = false, unique = true)
+    private String sku;
 
-    @Column(nullable = false)
     private String size;
 
-    @Column(nullable = false)
     private String color;
 
+    // ฟิลด์จำนวนสต็อกตามที่โค้ดเดิมเรียก getStockQty()
     @Column(name = "stock_qty", nullable = false)
-    private Integer stockQty; // จำนวนตัวที่มีในสต็อก
+    private Integer stockQty;
 
-    // โครงสร้างราคาตามภาพ JSON
-    @Column(name = "price_3_day", nullable = false)
+    // ฟิลด์ราคาแพ็กเกจวันตามที่ RentalAdminService เดิมเรียกใช้
     private BigDecimal price3Day;
-
-    @Column(name = "price_5_day", nullable = false)
     private BigDecimal price5Day;
-
-    @Column(name = "price_7_day", nullable = false)
     private BigDecimal price7Day;
+    private BigDecimal extraDayPrice;
 
-    @Column(name = "extra_day_price", nullable = false)
-    private BigDecimal extraDayPrice; // ราคาคิดเพิ่มต่อวันเมื่อเช่าเกินกำหนด
+    // รองรับทั้งแบบดึงตรง และแบบ List ในอนาคต
+    @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TierPrice> tierPrices = new ArrayList<>();
 }
