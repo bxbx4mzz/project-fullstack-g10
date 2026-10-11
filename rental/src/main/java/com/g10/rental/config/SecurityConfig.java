@@ -80,6 +80,12 @@ public class SecurityConfig {
                         "/api/products/**"
                 ).permitAll()
 
+                // Uploaded images are publicly accessible
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.GET,
+                    "/uploads/**"
+                ).permitAll()
+
                 // CUSTOMER
                 .requestMatchers(
                     "/api/customer/**"

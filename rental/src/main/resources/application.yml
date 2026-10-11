@@ -35,6 +35,11 @@ spring:
         chat:
           model: gemini-3.8-flash
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 server:
   port: 8080
   web:
@@ -51,6 +56,7 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
   admin-emails: ${ADMIN_EMAILS:}
   staff-emails: ${STAFF_EMAILS:}
+  upload-dir: uploads
 
 logging:
   level:
