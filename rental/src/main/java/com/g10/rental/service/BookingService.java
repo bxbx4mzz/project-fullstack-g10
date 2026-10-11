@@ -13,6 +13,9 @@ import com.g10.rental.entity.User;
 import com.g10.rental.repository.BookingRepository;
 import com.g10.rental.repository.CartRepository;
 import com.g10.rental.repository.UserRepository;
+import com.g10.rental.entity.Payment;
+import com.g10.rental.entity.PaymentStatus;
+import com.g10.rental.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,394 +33,336 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingService {
 
-    private final BookingRepository bookingRepository;
-    private final CartRepository cartRepository;
-    private final UserRepository userRepository;
-    private final AvailabilityService availabilityService;
+        private final BookingRepository bookingRepository;
+        private final CartRepository cartRepository;
+        private final UserRepository userRepository;
+        private final PaymentRepository paymentRepository;
+        private final AvailabilityService availabilityService;
 
-    /**
-     * Create booking from current user's cart.
-     */
-    @Transactional
-    public BookingResponse createBooking(
-            Authentication authentication,
-            CreateBookingRequest request
-    ) {
-
-        User user = getCurrentUser(authentication);
-
-        validateDates(
-                request.getRentDate(),
-                request.getReturnDate()
-        );
-
-        Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseThrow(() ->
-                        new RuntimeException("Cart not found")
-                );
-
-        if (cart.getItems() == null ||
-                cart.getItems().isEmpty()) {
-
-            throw new RuntimeException("Cart is empty");
-        }
-
-        Booking booking = Booking.builder()
-                .code(generateBookingCode())
-                .customerId(user.getId())
-                .customerName(request.getCustomerName())
-                .shippingAddress(request.getShippingAddress())
-                .rentDate(request.getRentDate())
-                .returnDate(request.getReturnDate())
-                .shippingMethod(request.getShippingMethod())
-                .discount(BigDecimal.ZERO)
-                .totalPrice(BigDecimal.ZERO)
-                .finalPrice(BigDecimal.ZERO)
-                .status(BookingStatus.PENDING)
-                .build();
-
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
-        for (CartItem cartItem : cart.getItems()) {
-
-            ProductVariant variant = cartItem.getVariant();
-
-            int quantity = cartItem.getQuantity();
-
-            /*
-             * Re-check availability at checkout.
-             * Cart availability can become outdated.
-             */
-            var availability =
-                    availabilityService.checkAvailability(
-                            variant.getId(),
-                            request.getRentDate(),
-                            request.getReturnDate()
-                    );
-
-            if (availability.getAvailableQty() < quantity) {
-                throw new RuntimeException(
-                        "Not enough availability for variant "
-                                + variant.getId()
-                );
-            }
-
-            BigDecimal unitPrice =
-                    calculateRentalPrice(
-                            variant,
-                            request.getRentDate(),
-                            request.getReturnDate()
-                    );
-
-            BigDecimal subtotal =
-                    unitPrice.multiply(
-                            BigDecimal.valueOf(quantity)
-                    );
-
-            BookingItem bookingItem = BookingItem.builder()
-                    .booking(booking)
-                    .variantId(variant.getId())
-                    .qty(quantity)
-                    .unitPrice(unitPrice)
-                    .build();
-
-            booking.getItems().add(bookingItem);
-
-            totalPrice = totalPrice.add(subtotal);
-        }
-
-        booking.setTotalPrice(totalPrice);
-
-        BigDecimal discount = BigDecimal.ZERO;
-
-        booking.setDiscount(discount);
-        booking.setFinalPrice(totalPrice.subtract(discount)
-
-        // // if have discounnt
-        // BigDecimal discount = totalPrice
-        // .multiply(new BigDecimal("0.10"));
-
-        // BigDecimal finalPrice =
-        // totalPrice.subtract(discount);
-
-        // // ซื้อ 2 ชิ้นขึ้นไป ลด 25%
-        // int totalQuantity = cart.getItems().stream()
-        //         .mapToInt(CartItem::getQuantity)
-        //         .sum();
-
-        // if (totalQuantity >= 2) {
-        //     discount = totalPrice.multiply(new BigDecimal("0.25"));
-        // }
-
-        // booking.setDiscount(discount);
-        // booking.setFinalPrice(totalPrice.subtract(discount));
-        );
-
-        Booking savedBooking =
-                bookingRepository.save(booking);
-
-        /*
-         * Booking has been created successfully,
-         * so clear the cart.
+        /**
+         * Create booking from current user's cart.
          */
-        cart.getItems().clear();
+        @Transactional
+        public BookingResponse createBooking(
+                        Authentication authentication,
+                        CreateBookingRequest request) {
 
-        return toResponse(savedBooking);
-    }
+                User user = getCurrentUser(authentication);
 
-    /**
-     * Get current user's bookings.
-     */
-    @Transactional(readOnly = true)
-    public List<BookingResponse> getMyBookings(
-            Authentication authentication
-    ) {
+                validateDates(
+                                request.getRentDate(),
+                                request.getReturnDate());
 
-        User user = getCurrentUser(authentication);
+                Cart cart = cartRepository.findByUserId(user.getId())
+                                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        return bookingRepository
-                .findByCustomerIdOrderByCreatedAtDesc(
-                        user.getId()
-                )
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+                if (cart.getItems() == null ||
+                                cart.getItems().isEmpty()) {
 
-    /**
-     * Get one booking belonging to current user.
-     */
-    @Transactional(readOnly = true)
-    public BookingResponse getBooking(
-            Authentication authentication,
-            Long id
-    ) {
+                        throw new RuntimeException("Cart is empty");
+                }
 
-        User user = getCurrentUser(authentication);
+                Booking booking = Booking.builder()
+                                .code(generateBookingCode())
+                                .customerId(user.getId())
+                                .customerName(request.getCustomerName())
+                                .shippingAddress(request.getShippingAddress())
+                                .rentDate(request.getRentDate())
+                                .returnDate(request.getReturnDate())
+                                .shippingMethod(request.getShippingMethod())
+                                .discount(BigDecimal.ZERO)
+                                .totalPrice(BigDecimal.ZERO)
+                                .finalPrice(BigDecimal.ZERO)
+                                .status(BookingStatus.PENDING)
+                                .build();
 
-        Booking booking =
-                bookingRepository
-                        .findByIdAndCustomerId(
-                                id,
-                                user.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Booking not found"
-                                )
-                        );
+                BigDecimal totalPrice = BigDecimal.ZERO;
 
-        return toResponse(booking);
-    }
+                for (CartItem cartItem : cart.getItems()) {
 
-    /**
-     * Cancel current user's booking.
-     */
-    @Transactional
-    public BookingResponse cancelBooking(
-            Authentication authentication,
-            Long id
-    ) {
+                        ProductVariant variant = cartItem.getVariant();
 
-        User user = getCurrentUser(authentication);
+                        int quantity = cartItem.getQuantity();
 
-        Booking booking =
-                bookingRepository
-                        .findByIdAndCustomerId(
-                                id,
-                                user.getId()
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Booking not found"
-                                )
-                        );
+                        /*
+                         * Re-check availability at checkout.
+                         * Cart availability can become outdated.
+                         */
+                        var availability = availabilityService.checkAvailability(
+                                        variant.getId(),
+                                        request.getRentDate(),
+                                        request.getReturnDate());
 
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            throw new RuntimeException(
-                    "Booking is already cancelled"
-            );
+                        if (availability.getAvailableQty() < quantity) {
+                                throw new RuntimeException(
+                                                "Not enough availability for variant "
+                                                                + variant.getId());
+                        }
+
+                        BigDecimal unitPrice = calculateRentalPrice(
+                                        variant,
+                                        request.getRentDate(),
+                                        request.getReturnDate());
+
+                        BigDecimal subtotal = unitPrice.multiply(
+                                        BigDecimal.valueOf(quantity));
+
+                        BookingItem bookingItem = BookingItem.builder()
+                                        .booking(booking)
+                                        .variantId(variant.getId())
+                                        .qty(quantity)
+                                        .unitPrice(unitPrice)
+                                        .build();
+
+                        booking.getItems().add(bookingItem);
+
+                        totalPrice = totalPrice.add(subtotal);
+                }
+
+                booking.setTotalPrice(totalPrice);
+
+                BigDecimal discount = BigDecimal.ZERO;
+
+                // // if have discounnt
+                // BigDecimal discount = totalPrice
+                // .multiply(new BigDecimal("0.10"));
+
+                // BigDecimal finalPrice =
+                // totalPrice.subtract(discount);
+
+                // // ซื้อ 2 ชิ้นขึ้นไป ลด 25%
+                // int totalQuantity = cart.getItems().stream()
+                // .mapToInt(CartItem::getQuantity)
+                // .sum();
+
+                // if (totalQuantity >= 2) {
+                // discount = totalPrice.multiply(new BigDecimal("0.25"));
+                // }
+
+                booking.setDiscount(discount);
+                booking.setFinalPrice(totalPrice.subtract(discount));
+
+                Booking savedBooking = bookingRepository.save(booking);
+
+                Payment payment = new Payment();
+                payment.setBooking(savedBooking);
+                payment.setAmount(savedBooking.getFinalPrice());
+                payment.setStatus(PaymentStatus.UNPAID);
+
+                paymentRepository.save(payment);
+
+                return toResponse(savedBooking);
         }
 
-        if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new RuntimeException(
-                    "Only pending booking can be cancelled"
-            );
+        /**
+         * Get current user's bookings.
+         */
+        @Transactional(readOnly = true)
+        public List<BookingResponse> getMyBookings(
+                        Authentication authentication) {
+                User user = getCurrentUser(authentication);
+
+                return bookingRepository
+                                .findByCustomerIdOrderByCreatedAtDesc(user.getId())
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
         }
 
-        booking.setStatus(BookingStatus.CANCELLED);
+        /**
+         * Get one booking belonging to current user.
+         */
+        @Transactional(readOnly = true)
+        public BookingResponse getBooking(
+                        Authentication authentication,
+                        Long id) {
+                User user = getCurrentUser(authentication);
 
-        return toResponse(
-                bookingRepository.save(booking)
-        );
-    }
+                Booking booking = bookingRepository
+                                .findByIdAndCustomerId(id, user.getId())
+                                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-    /**
-     * Validate rental dates.
-     */
-    private void validateDates(
-            LocalDate rentDate,
-            LocalDate returnDate
-    ) {
-
-        if (rentDate == null ||
-                returnDate == null) {
-
-            throw new IllegalArgumentException(
-                    "Rent date and return date are required"
-            );
+                return toResponse(booking);
         }
 
-        if (rentDate.isAfter(returnDate)) {
+        // Cancel current user's booking.
+        @Transactional
+        public BookingResponse cancelBooking(
+                        Authentication authentication,
+                        Long id) {
 
-            throw new IllegalArgumentException(
-                    "Rent date must be before or equal to return date"
-            );
-        }
-    }
+                User user = getCurrentUser(authentication);
 
-    /**
-     * Calculate rental price based on rental duration.
-     *
-     * 3 days -> price3Day
-     * 5 days -> price5Day
-     * 7 days -> price7Day
-     * > 7 days -> price7Day + extraDayPrice
-     */
-    private BigDecimal calculateRentalPrice(
-            ProductVariant variant,
-            LocalDate rentDate,
-            LocalDate returnDate
-    ) {
+                Booking booking = bookingRepository
+                                .findByIdAndCustomerId(
+                                                id,
+                                                user.getId())
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Booking not found"));
 
-        long rentalDays =
-                ChronoUnit.DAYS.between(
-                        rentDate,
-                        returnDate
-                ) + 1;
+                if (booking.getStatus() == BookingStatus.CANCELLED) {
+                        throw new RuntimeException(
+                                        "Booking is already cancelled");
+                }
 
-        if (rentalDays == 3) {
-            return variant.getPrice3Day();
-        }
+                if (booking.getStatus() != BookingStatus.PENDING) {
+                        throw new RuntimeException(
+                                        "Only pending booking can be cancelled");
+                }
 
-        if (rentalDays == 5) {
-            return variant.getPrice5Day();
-        }
+                booking.setStatus(BookingStatus.CANCELLED);
 
-        if (rentalDays == 7) {
-            return variant.getPrice7Day();
-        }
+                Payment payment = paymentRepository
+                                .findByBookingId(id)
+                                .orElse(null);
 
-        if (rentalDays > 7) {
+                if (payment != null && payment.getStatus() == PaymentStatus.UNPAID) {
+                        payment.setStatus(PaymentStatus.CANCELLED);
+                        paymentRepository.save(payment);
+                }
 
-            long extraDays = rentalDays - 7;
-
-            return variant.getPrice7Day()
-                    .add(
-                            variant.getExtraDayPrice()
-                                    .multiply(
-                                            BigDecimal.valueOf(
-                                                    extraDays
-                                            )
-                                    )
-                    );
+                return toResponse(
+                                bookingRepository.save(booking));
         }
 
-        throw new IllegalArgumentException(
-                "Rental duration must be at least 3 days"
-        );
-    }
+        // Validate rental dates.
+        private void validateDates(
+                        LocalDate rentDate,
+                        LocalDate returnDate) {
 
-    /**
-     * Get currently authenticated user.
-     */
-    private User getCurrentUser(
-            Authentication authentication
-    ) {
+                if (rentDate == null || returnDate == null) {
+                        throw new IllegalArgumentException(
+                                        "Rent date and return date are required");
+                }
 
-        if (authentication == null ||
-                !authentication.isAuthenticated()) {
+                if (rentDate.isAfter(returnDate)) {
 
-            throw new RuntimeException(
-                    "User is not authenticated"
-            );
+                        throw new IllegalArgumentException(
+                                        "Rent date must be before or equal to return date");
+                }
         }
 
-        String email = authentication.getName();
+        /**
+         * Calculate rental price based on rental duration.
+         *
+         * 3 days -> price3Day
+         * 5 days -> price5Day
+         * 7 days -> price7Day
+         * > 7 days -> price7Day + extraDayPrice
+         */
+        private BigDecimal calculateRentalPrice(
+                        ProductVariant variant,
+                        LocalDate rentDate,
+                        LocalDate returnDate) {
 
-        return userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "User not found"
-                        )
-                );
-    }
+                long rentalDays = ChronoUnit.DAYS.between(
+                                rentDate,
+                                returnDate) + 1;
 
-    /**
-     * Generate unique booking code.
-     */
-    private String generateBookingCode() {
+                if (rentalDays == 3) {
+                        return variant.getPrice3Day();
+                }
 
-        String code;
+                if (rentalDays == 5) {
+                        return variant.getPrice5Day();
+                }
 
-        do {
-            code = "B-" +
-                    UUID.randomUUID()
-                            .toString()
-                            .substring(0, 8)
-                            .toUpperCase();
+                if (rentalDays == 7) {
+                        return variant.getPrice7Day();
+                }
 
-        } while (bookingRepository.existsByCode(code));
+                if (rentalDays > 7) {
 
-        return code;
-    }
+                        long extraDays = rentalDays - 7;
 
-    /**
-     * Convert entity to response DTO.
-     */
-    private BookingResponse toResponse(
-            Booking booking
-    ) {
+                        return variant.getPrice7Day()
+                                        .add(
+                                                        variant.getExtraDayPrice()
+                                                                        .multiply(
+                                                                                        BigDecimal.valueOf(
+                                                                                                        extraDays)));
+                }
 
-        List<BookingItemResponse> items =
-                booking.getItems()
-                        .stream()
-                        .map(item ->
-                                BookingItemResponse.builder()
-                                        .id(item.getId())
-                                        .variantId(
-                                                item.getVariantId()
-                                        )
-                                        .qty(item.getQty())
-                                        .unitPrice(
-                                                item.getUnitPrice()
-                                        )
-                                        .build()
-                        )
-                        .toList();
+                throw new IllegalArgumentException(
+                                "Rental duration must be at least 3 days");
+        }
 
-        return BookingResponse.builder()
-                .id(booking.getId())
-                .code(booking.getCode())
-                .customerId(booking.getCustomerId())
-                .customerName(
-                        booking.getCustomerName()
-                )
-                .shippingAddress(
-                        booking.getShippingAddress()
-                )
-                .rentDate(booking.getRentDate())
-                .returnDate(booking.getReturnDate())
-                .shippingMethod(
-                        booking.getShippingMethod()
-                )
-                .discount(booking.getDiscount())
-                .totalPrice(booking.getTotalPrice())
-                .finalPrice(booking.getFinalPrice())
-                .status(booking.getStatus())
-                .createdAt(booking.getCreatedAt())
-                .items(items)
-                .build();
-    }
+        /**
+         * Get currently authenticated user.
+         */
+        private User getCurrentUser(
+                        Authentication authentication) {
+
+                if (authentication == null ||
+                                !authentication.isAuthenticated()) {
+
+                        throw new RuntimeException(
+                                        "User is not authenticated");
+                }
+
+                String email = authentication.getName();
+
+                return userRepository
+                                .findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "User not found"));
+        }
+
+        /**
+         * Generate unique booking code.
+         */
+        private String generateBookingCode() {
+
+                String code;
+
+                do {
+                        code = "B-" +
+                                        UUID.randomUUID()
+                                                        .toString()
+                                                        .substring(0, 8)
+                                                        .toUpperCase();
+
+                } while (bookingRepository.existsByCode(code));
+
+                return code;
+        }
+
+        /**
+         * Convert entity to response DTO.
+         */
+        private BookingResponse toResponse(
+                        Booking booking) {
+
+                List<BookingItemResponse> items = booking.getItems()
+                                .stream()
+                                .map(item -> BookingItemResponse.builder()
+                                                .id(item.getId())
+                                                .variantId(
+                                                                item.getVariantId())
+                                                .qty(item.getQty())
+                                                .unitPrice(
+                                                                item.getUnitPrice())
+                                                .build())
+                                .toList();
+
+                return BookingResponse.builder()
+                                .id(booking.getId())
+                                .code(booking.getCode())
+                                .customerId(booking.getCustomerId())
+                                .customerName(
+                                                booking.getCustomerName())
+                                .shippingAddress(
+                                                booking.getShippingAddress())
+                                .rentDate(booking.getRentDate())
+                                .returnDate(booking.getReturnDate())
+                                .shippingMethod(
+                                                booking.getShippingMethod())
+                                .discount(booking.getDiscount())
+                                .totalPrice(booking.getTotalPrice())
+                                .finalPrice(booking.getFinalPrice())
+                                .status(booking.getStatus())
+                                .createdAt(booking.getCreatedAt())
+                                .items(items)
+                                .build();
+        }
 }
