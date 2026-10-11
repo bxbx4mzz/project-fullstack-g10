@@ -4,6 +4,7 @@ import com.g10.rental.entity.Role;
 import com.g10.rental.entity.User;
 import com.g10.rental.repository.UserRepository;
 import com.g10.rental.security.CustomOAuth2User;
+import com.g10.rental.service.AdminUserService;
 import com.g10.rental.dto.user.UpdateRoleRequest;
 import com.g10.rental.dto.user.UserResponse;
 import jakarta.validation.Valid;
@@ -26,9 +27,11 @@ import java.util.List;
 public class AdminUserController {
 
     private final UserRepository userRepository;
+    private final AdminUserService adminUserService;
 
-    public AdminUserController(UserRepository userRepository) {
+    public AdminUserController(UserRepository userRepository, AdminUserService adminUserService) {
         this.userRepository = userRepository;
+        this.adminUserService = adminUserService;
     }
 
     @GetMapping
@@ -57,12 +60,6 @@ public class AdminUserController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id, @AuthenticationPrincipal CustomOAuth2User principal) {
-        if (id.equals(principal.getUser().getId())) {
-            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "ไม่สามารถลบบัญชีตัวเองได้");
-        }
-        if (!userRepository.existsById(id)) {
-            throw new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "ไม่พบผู้ใช้นี้");
-        }
-        userRepository.deleteById(id);
+        adminUserService.deleteUser(id, principal.getUser().getId());
     }
 }

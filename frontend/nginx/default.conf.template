@@ -1,30 +1,18 @@
 server {
-    listen 6000;
+    listen 80;
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
 
+    client_max_body_size 6m;
+
     # Reverse proxy ไปยัง backend เพื่อให้ frontend + backend อยู่ origin เดียวกัน
     # (จำเป็นสำหรับ session cookie ที่ใช้ยืนยันตัวตน)
-    location /api/ {
+    # ใช้ $http_host (มีเลข port) เพื่อให้ backend สร้าง redirect URI ของ Google login ถูกต้อง
+    location ~ ^/(api|oauth2|login|uploads)/ {
         proxy_pass ${NGINX_PROXY};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /oauth2/ {
-        proxy_pass ${NGINX_PROXY};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /login/ {
-        proxy_pass ${NGINX_PROXY};
-        proxy_set_header Host $host;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;

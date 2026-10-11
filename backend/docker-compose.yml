@@ -17,6 +17,8 @@ services:
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       STAFF_EMAILS: ${STAFF_EMAILS:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.8-flash}
     volumes:
       - .:/app
       - maven-cache:/root/.m2
@@ -25,6 +27,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  frontend:
+    container_name: g10-pj-frontend
+    build:
+      context: ../frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      NGINX_PROXY: http://backend:8080
+    depends_on:
+      - backend
 
   postgres:
     container_name: g10-pj-postgres

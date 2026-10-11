@@ -342,6 +342,101 @@
   background: var(--fx-surface);
 }
 
+.fx-cart-qty button:disabled {
+  @apply cursor-not-allowed opacity-40;
+}
+
+.fx-cart-qty-wrap {
+  @apply flex flex-col items-center gap-1;
+}
+
+.fx-cart-stock-hint {
+  @apply text-[0.72rem] whitespace-nowrap;
+  color: var(--fx-text-muted);
+}
+
+.fx-cart-stock-hint.fx-at-limit {
+  color: var(--fx-accent-dark);
+}
+
+.fx-duration-hint {
+  @apply mt-1.5 block text-[0.8rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-duration-hint.fx-duration-bad {
+  color: var(--fx-danger);
+}
+
+.fx-alert {
+  @apply mb-4 flex items-start gap-3 rounded-xl border px-4 py-3;
+  animation: fx-alert-in 0.18s ease-out;
+}
+
+.fx-alert-error {
+  background: #fdf1ef;
+  border-color: #f2c9c4;
+  color: #8f3a33;
+}
+
+.fx-alert-success {
+  background: #eef7ee;
+  border-color: #c7e3c7;
+  color: #2f6b34;
+}
+
+.fx-alert-info {
+  background: var(--fx-accent-soft);
+  border-color: var(--fx-accent);
+  color: var(--fx-accent-dark);
+}
+
+.fx-alert-icon {
+  @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[0.8rem] font-bold text-white;
+}
+
+.fx-alert-error .fx-alert-icon {
+  background: var(--fx-danger);
+}
+
+.fx-alert-success .fx-alert-icon {
+  background: #4a9a50;
+}
+
+.fx-alert-info .fx-alert-icon {
+  background: var(--fx-accent);
+}
+
+.fx-alert-body {
+  @apply min-w-0 flex-1;
+}
+
+.fx-alert-title {
+  @apply block text-[0.92rem];
+}
+
+.fx-alert-message {
+  @apply mt-0.5 text-[0.88rem] leading-snug;
+  overflow-wrap: anywhere;
+}
+
+.fx-alert-close {
+  @apply -mr-1 -mt-0.5 cursor-pointer border-0 bg-transparent px-1 text-xl leading-none;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.fx-alert-close:hover {
+  opacity: 1;
+}
+
+@keyframes fx-alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
 .fx-cart-summary {
   @apply flex justify-between py-2 text-[0.92rem];
 }

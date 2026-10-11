@@ -105,15 +105,15 @@ export interface CreateProductInput {
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     credentials: 'include',
-    headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
+    headers: typeof options.body === 'string' ? { 'Content-Type': 'application/json' } : undefined,
     ...options,
   })
   if (!res.ok) {
     const body = await res.json().catch(() => null)
     throw new Error(body?.message ?? `Request failed (${res.status})`)
   }
-  if (res.status === 204) return undefined as T
-  return (await res.json()) as T
+  const text = await res.text()
+  return (text ? JSON.parse(text) : undefined) as T
 }
 
 export function fetchProducts(): Promise<ApiProduct[]> {
@@ -162,6 +162,7 @@ export interface ApiCartItem {
   color: string | null
   price: number
   quantity: number
+  stockQty: number
   subtotal: number
 }
 
@@ -253,6 +254,38 @@ export function createBooking(input: CreateBookingInput): Promise<ApiBooking> {
   return apiFetch('/api/bookings', { method: 'POST', body: JSON.stringify(input) })
 }
 
+export type PaymentStatus = 'UNPAID' | 'PAID' | 'FAILED' | 'CANCELLED'
+
+export interface ApiPayment {
+  id: number
+  bookingId: number
+  bookingCode: string
+  bookingStatus: BookingStatus
+  amount: number
+  status: PaymentStatus
+  transactionId: string | null
+  paidAt: string | null
+}
+
+export function fetchPayment(bookingId: number): Promise<ApiPayment> {
+  return apiFetch(`/api/payments/${bookingId}`)
+}
+
+export function payBooking(bookingId: number): Promise<ApiPayment> {
+  return apiFetch(`/api/payments/${bookingId}`, { method: 'POST' })
+}
+
+export async function uploadProductImage(file: File): Promise<string> {
+  const body = new FormData()
+  body.append('file', file)
+  const res = await apiFetch<{ imageUrl: string }>('/api/uploads/images', { method: 'POST', body })
+  return res.imageUrl
+}
+
+export function resolveImageUrl(url: string): string {
+  return url.startsWith('/uploads/') ? `${API_BASE_URL}${url}` : url
+}
+
 export function fetchMyBookings(): Promise<ApiBooking[]> {
   return apiFetch('/api/bookings/me')
 }
@@ -296,4 +329,46 @@ export interface DashboardSummary {
 
 export function fetchDashboardSummary(): Promise<DashboardSummary> {
   return apiFetch('/api/staff/dashboard/summary')
+}
+
+export interface DailyTasks {
+  date: string
+  toDispatchToday: ApiBooking[]
+  toReturnToday: ApiBooking[]
+}
+
+export function fetchDailyTasks(date?: string): Promise<DailyTasks> {
+  return apiFetch(`/api/staff/dashboard/daily-tasks${date ? `?date=${date}` : ''}`)
+}
+
+export interface CalendarEvent {
+  bookingId: number
+  code: string
+  customerName: string
+  start: string
+  end: string
+  status: BookingStatus
+  color: string
+}
+
+export function fetchStaffCalendar(start: string, end: string): Promise<CalendarEvent[]> {
+  return apiFetch(`/api/staff/calendar?start=${start}&end=${end}`)
+}
+
+export interface VariantCalendar {
+  variantId: number
+  stockQty: number
+  bookings: { start: string; end: string; qty: number }[]
+}
+
+export function fetchVariantCalendar(variantId: number, start: string, end: string): Promise<VariantCalendar> {
+  return apiFetch(`/api/variants/${variantId}/calendar?start=${start}&end=${end}`)
+}
+
+export async function sendChatMessage(message: string): Promise<string> {
+  const res = await apiFetch<{ message: string }>('/api/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+  })
+  return res.message
 }

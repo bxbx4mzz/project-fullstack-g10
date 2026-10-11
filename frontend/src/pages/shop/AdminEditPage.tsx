@@ -11,6 +11,7 @@ import {
 } from './components/store'
 import { ProductFormModal } from './components/ProductFormModal'
 import { deleteProduct, updateProduct } from '../../lib/api'
+import { FxAlert } from './components/FxAlert'
 
 function parsePricePerDay(display: string): number {
   const match = display.match(/\d+(\.\d+)?/)
@@ -79,7 +80,7 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
         name,
         description,
         price: pricePerDay,
-        imageUrl: active.icon.startsWith('http') || active.icon.startsWith('data:') ? active.icon : '',
+        imageUrl: /^(http|data:|\/uploads\/)/.test(active.icon) ? active.icon : '',
         category,
         stock,
       })
@@ -119,9 +120,9 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
       </div>
 
       {productsError && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert>
           {productsError}
-        </div>
+        </FxAlert>
       )}
 
       {products.length === 0 && !productsError && <p className="fx-page-subtitle">กำลังโหลดสินค้า...</p>}

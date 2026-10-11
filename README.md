@@ -38,7 +38,9 @@ Pa yment
    ```
 
 3. **สร้าง Google OAuth Client** ที่ [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   → ตอนตั้งค่า **Authorized redirect URI** ใส่: `http://localhost:8080/login/oauth2/code/google`
+   → ตอนตั้งค่า **Authorized redirect URI** ใส่ทั้ง 2 อัน:
+     - `http://localhost:8080/login/oauth2/code/google` (ใช้ตอนรัน frontend ด้วย `pnpm dev`)
+     - `http://localhost:3000/login/oauth2/code/google` (ใช้ตอนรัน frontend ใน Docker)
    → เก็บ **Client ID** กับ **Client Secret** ไว้ใช้ในข้อ 4
 
 4. **ตั้งค่า environment variables ฝั่ง backend**
@@ -61,7 +63,7 @@ Pa yment
    cd backend
    docker compose up -d --build
    ```
-    เช็คว่าขึ้นสำเร็จด้วย `docker compose ps` — ต้องเห็น `g10-pj-backend` และ `g10-pj-postgres` เป็น `running`/`healthy`
+    เช็คว่าขึ้นสำเร็จด้วย `docker compose ps` — ต้องเห็น `g10-pj-backend`, `g10-pj-postgres` และ `g10-pj-frontend` เป็น `running`/`healthy`
 
 7. **ติดตั้ง dependency ฝั่ง frontend**
    ```bash
@@ -75,7 +77,16 @@ Pa yment
    ```
    เสร็จแล้วเปิดเบราว์เซอร์ไปที่ **http://localhost:5173**
 
-รันแบบ docker เต็มระบบ (frontend ผ่าน nginx ด้วย ไม่ต้องรัน `pnpm dev`) ดูรายละเอียดใน `backend/docker-compose.yml`
-และ `frontend/docker-compose.yml`
+### รันทั้งระบบใน Docker (ไม่ต้องรัน `pnpm dev`)
+
+`docker compose up -d --build` ในข้อ 6 สร้าง container frontend (nginx) ให้ด้วยแล้ว ใช้แบบนี้ได้เลย:
+
+1. ใน `backend/.env` ตั้ง `FRONTEND_URL=http://localhost:3000` แล้วรัน `docker compose up -d backend` ใหม่
+   (backend ส่งผู้ใช้กลับไปที่ URL นี้หลัง login — ถ้ากลับไปใช้ `pnpm dev` ให้เปลี่ยนเป็น `http://localhost:5173`)
+2. เปิด **http://localhost:3000**
+
+nginx ใน container frontend ส่งต่อ `/api`, `/oauth2`, `/login`, `/uploads` ไปที่ backend ให้ frontend กับ backend
+อยู่ origin เดียวกัน เปลี่ยน port ได้ด้วย `FRONTEND_PORT` ใน `backend/.env` (อย่าใช้ 6000 เพราะ Chrome บล็อก)
+ถ้าแก้โค้ด frontend ต้องรัน `docker compose up -d --build frontend` ใหม่ถึงจะเห็นผล
 
 ---

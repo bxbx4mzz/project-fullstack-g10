@@ -1,14 +1,14 @@
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 
-RUN corepack enable
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN npm install -g pnpm@12.4.1
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 # Production build calls the API on the same origin (nginx proxies /api, /oauth2,
-# /login to the backend below), so VITE_API_BASE_URL is left empty on purpose.
+# /login, /uploads to the backend), so VITE_API_BASE_URL is left empty on purpose.
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm build
@@ -22,4 +22,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # /etc/nginx/conf.d/default.conf
 ENV NGINX_PROXY=http://backend:8080
 
-EXPOSE 6000
+EXPOSE 80

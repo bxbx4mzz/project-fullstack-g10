@@ -59,7 +59,7 @@ export default function App() {
             }
           />
           <Route
-            path="/shop/payment"
+            path="/shop/payment/:bookingId"
             element={
               <ProtectedRoute>
                 <ShopPaymentPage />

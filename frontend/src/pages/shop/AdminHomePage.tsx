@@ -4,6 +4,7 @@ import { FxLayout, type FxNavItem } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
 import { useEnsureProductsLoaded, useProducts, useProductsError } from './components/store'
 import { ProductThumb } from './components/ProductThumb'
+import { FxAlert } from './components/FxAlert'
 
 type AdminHomePageProps = {
   brand?: string
@@ -43,9 +44,9 @@ export function AdminHomePage({
       />
 
       {productsError && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert>
           {productsError}
-        </div>
+        </FxAlert>
       )}
 
       {filteredProducts.length === 0 && !productsError && <p className="fx-page-subtitle">ไม่พบสินค้าที่ตรงกับ "{query}"</p>}

@@ -1,7 +1,38 @@
 import { useEffect, useState } from 'react'
 import { FxLayout, type FxNavItem } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
-import { fetchDashboardSummary, fetchStaffBookings, type ApiBooking, type DashboardSummary } from '../../lib/api'
+import {
+  fetchDailyTasks,
+  fetchDashboardSummary,
+  fetchStaffBookings,
+  type ApiBooking,
+  type DailyTasks,
+  type DashboardSummary,
+} from '../../lib/api'
+import { FxAlert } from './components/FxAlert'
+
+function TaskList({ title, bookings }: { title: string; bookings: ApiBooking[] | undefined }) {
+  return (
+    <div className="fx-card">
+      <strong>
+        {title} ({bookings?.length ?? 0})
+      </strong>
+      {bookings && bookings.length > 0 ? (
+        <ul style={{ margin: '8px 0 0', paddingLeft: 18 }}>
+          {bookings.map((b) => (
+            <li key={b.id}>
+              {b.code} - {b.customerName} ({b.shippingMethod})
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="fx-page-subtitle" style={{ margin: '8px 0 0' }}>
+          ไม่มีรายการ
+        </p>
+      )}
+    </div>
+  )
+}
 
 type AdminOverviewPageProps = {
   brand?: string
@@ -11,13 +42,15 @@ type AdminOverviewPageProps = {
 export function AdminOverviewPage({ brand = 'Admin - Clothing Rental Shop', navItems = adminNavItems }: AdminOverviewPageProps) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null)
   const [bookings, setBookings] = useState<ApiBooking[] | null>(null)
+  const [tasks, setTasks] = useState<DailyTasks | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    Promise.all([fetchDashboardSummary(), fetchStaffBookings()])
-      .then(([s, b]) => {
+    Promise.all([fetchDashboardSummary(), fetchStaffBookings(), fetchDailyTasks()])
+      .then(([s, b, t]) => {
         setSummary(s)
         setBookings(b.slice(0, 10))
+        setTasks(t)
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'โหลดภาพรวมไม่สำเร็จ'))
   }, [])
@@ -28,9 +61,9 @@ export function AdminOverviewPage({ brand = 'Admin - Clothing Rental Shop', navI
       <p className="fx-page-subtitle">สรุปการจองและรายได้ล่าสุด</p>
 
       {error && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert onClose={() => setError(null)}>
           {error}
-        </div>
+        </FxAlert>
       )}
 
       <div className="fx-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 20 }}>
@@ -52,6 +85,11 @@ export function AdminOverviewPage({ brand = 'Admin - Clothing Rental Shop', navI
           </p>
           <h2 style={{ margin: '6px 0 0' }}>฿ {summary?.totalRevenue ?? 0}</h2>
         </div>
+      </div>
+
+      <div className="fx-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: 20 }}>
+        <TaskList title="ต้องจัดส่งวันนี้" bookings={tasks?.toDispatchToday} />
+        <TaskList title="ต้องรับคืนวันนี้" bookings={tasks?.toReturnToday} />
       </div>
 
       <div className="fx-card">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { FxLayout, type FxNavItem } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
 import { fetchBookingSummaryMessage, fetchStaffBookings, updateBookingStatus, type ApiBooking, type BookingStatus } from '../../lib/api'
+import { FxAlert } from './components/FxAlert'
 
 const STATUS_LABEL: Record<BookingStatus, string> = {
   PENDING: 'Pending',
@@ -23,6 +24,8 @@ const NEXT_ACTION_LABEL: Partial<Record<BookingStatus, string>> = {
   SHIPPED: 'Mark as returned',
 }
 
+const isAwaitingPayment = (o: ApiBooking) => o.status === 'PENDING' && o.source === 'ONLINE'
+
 type AdminOrdersPageProps = {
   brand?: string
   navItems?: FxNavItem[]
@@ -36,6 +39,9 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
   const [messageLoading, setMessageLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
+
+  const activeOrders = orders?.filter((o) => !isAwaitingPayment(o))
+  const unpaidOrders = orders?.filter(isAwaitingPayment) ?? []
 
   async function load() {
     try {
@@ -97,6 +103,7 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
       setCopiedId(order.id)
       setTimeout(() => setCopiedId(null), 2000)
     } catch {
+      setError('คัดลอกข้อความไม่สำเร็จ กรุณาคัดลอกด้วยตนเอง')
     }
   }
 
@@ -106,15 +113,15 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
       <p className="fx-page-subtitle">ติดตามสถานะการจอง และแจ้งลูกค้าเมื่อจัดส่งชุดแล้ว</p>
 
       {error && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert onClose={() => setError(null)}>
           {error}
-        </div>
+        </FxAlert>
       )}
 
       {orders === null && !error && <p className="fx-page-subtitle">กำลังโหลด...</p>}
-      {orders?.length === 0 && <div className="fx-card">ยังไม่มีการจอง</div>}
+      {activeOrders?.length === 0 && <div className="fx-card" style={{ marginBottom: 16 }}>ยังไม่มีการจองที่ชำระเงินแล้ว</div>}
 
-      {orders?.map((order) => {
+      {activeOrders?.map((order) => {
         const itemsSummary = order.items.map((i) => `variant #${i.variantId} x${i.qty}`).join(', ')
         return (
           <div className="fx-card" key={order.id} style={{ marginBottom: 16 }}>
@@ -166,6 +173,50 @@ export function AdminOrdersPage({ brand = 'Admin - Clothing Rental Shop', navIte
           </div>
         )
       })}
+
+      {unpaidOrders.length > 0 && (
+        <details className="fx-card" style={{ marginTop: 8 }}>
+          <summary style={{ cursor: 'pointer', fontWeight: 600 }}>
+            รอลูกค้าชำระเงิน ({unpaidOrders.length})
+            <span className="fx-page-subtitle" style={{ fontWeight: 400, marginLeft: 8 }}>
+              ยังไม่นับเป็นออเดอร์จนกว่าลูกค้าจะจ่าย
+            </span>
+          </summary>
+          <table className="fx-table" style={{ marginTop: 12 }}>
+            <thead>
+              <tr>
+                <th>รหัสจอง</th>
+                <th>ลูกค้า</th>
+                <th>ช่วงเช่า</th>
+                <th>ยอด</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {unpaidOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.code}</td>
+                  <td>{order.customerName}</td>
+                  <td>
+                    {order.rentDate} – {order.returnDate}
+                  </td>
+                  <td>฿{order.finalPrice}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="fx-btn fx-btn-ghost"
+                      disabled={busyId === order.id}
+                      onClick={() => cancelOrder(order.id)}
+                    >
+                      ยกเลิก
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
+      )}
     </FxLayout>
   )
 }

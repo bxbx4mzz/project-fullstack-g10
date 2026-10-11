@@ -10,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -48,6 +49,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/oauth2/**", "/login/**", "/api/auth/me", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/customer/**").hasAnyRole("CUSTOMER", "STAFF", "ADMIN")
                         .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

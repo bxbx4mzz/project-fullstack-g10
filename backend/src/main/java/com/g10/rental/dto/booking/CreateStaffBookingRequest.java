@@ -4,7 +4,9 @@ import com.g10.rental.entity.ShippingMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +31,7 @@ public class CreateStaffBookingRequest {
     @NotNull
     private ShippingMethod shippingMethod;
 
+    @PositiveOrZero(message = "ส่วนลดต้องไม่ติดลบ")
     private BigDecimal discount;
 
     @NotEmpty
@@ -42,6 +45,7 @@ public class CreateStaffBookingRequest {
         private Long variantId;
 
         @NotNull
+        @Min(value = 1, message = "จำนวนต้องมีอย่างน้อย 1 ชิ้น")
         private Integer qty;
     }
 }

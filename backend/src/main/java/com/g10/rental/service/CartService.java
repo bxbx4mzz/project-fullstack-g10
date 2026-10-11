@@ -50,10 +50,10 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("Product variant not found"));
 
         if (request.getQuantity() > variant.getStockQty()) {
-            throw new RuntimeException("Not enough variant stock");
+            throw new IllegalArgumentException(notEnoughStockMessage(variant));
         }
 
-        Cart cart = cartRepository.findByUserId(user.getId()).orElseGet(() -> createCart(user));
+        Cart cart =cartRepository.findByUserId(user.getId()).orElseGet(() -> createCart(user));
 
         CartItem cartItem = cartItemRepository
                 .findByCartIdAndVariantId(cart.getId(), variant.getId())
@@ -64,7 +64,8 @@ public class CartService {
         } else {
             int newQuantity = cartItem.getQuantity() + request.getQuantity();
             if (newQuantity > variant.getStockQty()) {
-                throw new RuntimeException("Not enough variant stock");
+                throw new IllegalArgumentException(notEnoughStockMessage(variant)
+                        + " (ในตะกร้ามีอยู่แล้ว " + cartItem.getQuantity() + " ชิ้น)");
             }
             cartItem.setQuantity(newQuantity);
         }
@@ -83,7 +84,7 @@ public class CartService {
 
         ProductVariant variant = cartItem.getVariant();
         if (request.getQuantity() > variant.getStockQty()) {
-            throw new RuntimeException("Not enough variant stock");
+            throw new IllegalArgumentException(notEnoughStockMessage(variant));
         }
 
         cartItem.setQuantity(request.getQuantity());
@@ -162,7 +163,14 @@ public class CartService {
                 .color(variant.getColor())
                 .price(price)
                 .quantity(item.getQuantity())
+                .stockQty(variant.getStockQty())
                 .subtotal(subtotal)
                 .build();
+    }
+
+    private String notEnoughStockMessage(ProductVariant variant) {
+        String name = productRepository.findById(variant.getProductId()).map(Product::getName).orElse("ชุดนี้");
+        return name + " (ไซซ์ " + variant.getSize() + " / สี " + variant.getColor() + ") มีให้เช่าสูงสุด "
+                + variant.getStockQty() + " ชิ้น";
     }
 }

@@ -3,6 +3,7 @@ import { FxLayout } from './components/FxLayout'
 import { adminNavItems } from './components/navItems'
 import { useAuth } from '../../context/AuthContext'
 import { deleteUser, listUsers, updateUserRole, type CurrentUser, type Role } from '../../lib/api'
+import { FxAlert } from './components/FxAlert'
 
 const ROLE_LABEL: Record<Role, string> = {
   CUSTOMER: 'Customer',
@@ -56,9 +57,9 @@ export function AdminUsersPage() {
       <p className="fx-page-subtitle">มอบหรือถอน role ลูกค้า / พนักงาน / เจ้าของร้าน</p>
 
       {error && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert onClose={() => setError(null)}>
           {error}
-        </div>
+        </FxAlert>
       )}
 
       <div className="fx-card">

@@ -15,6 +15,11 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
   security:
     oauth2:
       client:
@@ -29,6 +34,8 @@ spring:
 
 server:
   port: 8080
+  # เคารพ X-Forwarded-* จาก nginx (เช่น https ตอน deploy) เวลาสร้าง redirect URI ของ Google login
+  forward-headers-strategy: framework
   error:
     include-message: always
   servlet:
@@ -44,6 +51,11 @@ app:
   # รายชื่ออีเมลที่ whitelist ไว้ล่วงหน้าให้เป็น STAFF / ADMIN (คั่นด้วย comma)
   admin-emails: ${ADMIN_EMAILS:}
   staff-emails: ${STAFF_EMAILS:}
+  upload-dir: ${UPLOAD_DIR:uploads}
+  gemini:
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-3.8-flash}
 
 logging:
   level:

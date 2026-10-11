@@ -1,8 +1,14 @@
 package com.g10.rental.service;
 
 import com.g10.rental.exception.ProductNotFoundException;
+import com.g10.rental.entity.Booking;
+import com.g10.rental.entity.BookingItem;
+import com.g10.rental.entity.BookingStatus;
 import com.g10.rental.entity.Product;
 import com.g10.rental.entity.ProductVariant;
+import com.g10.rental.repository.BookingItemRepository;
+import com.g10.rental.repository.CartItemRepository;
+import com.g10.rental.repository.FavoriteRepository;
 import com.g10.rental.repository.ProductRepository;
 import com.g10.rental.repository.ProductVariantRepository;
 import com.g10.rental.dto.product.CreateProductRequest;
@@ -15,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -24,6 +32,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final BookingItemRepository bookingItemRepository;
+    private final CartItemRepository cartItemRepository;
+    private final FavoriteRepository favoriteRepository;
+
+    private static final Set<BookingStatus> ACTIVE_BOOKING_STATUSES =
+            EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.SHIPPED);
 
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream().map(this::toResponse).toList();
@@ -77,10 +91,32 @@ public class ProductService {
         return toResponse(productRepository.save(product));
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException("Product not found with id: " + id);
         }
+
+        List<ProductVariant> variants = productVariantRepository.findByProductId(id);
+        List<Long> variantIds = variants.stream().map(ProductVariant::getId).toList();
+
+        List<String> activeBookingCodes = variantIds.stream()
+                .flatMap(variantId -> bookingItemRepository.findByVariantId(variantId).stream())
+                .map(BookingItem::getBooking)
+                .filter(b -> ACTIVE_BOOKING_STATUSES.contains(b.getStatus()))
+                .map(Booking::getCode)
+                .distinct()
+                .toList();
+        if (!activeBookingCodes.isEmpty()) {
+            throw new IllegalArgumentException("ลบสินค้านี้ไม่ได้ เพราะยังมีการจองที่ยังไม่จบ: "
+                    + String.join(", ", activeBookingCodes));
+        }
+
+        if (!variantIds.isEmpty()) {
+            cartItemRepository.deleteAllByVariantIds(variantIds);
+        }
+        favoriteRepository.deleteAllByProductId(id);
+        productVariantRepository.deleteAll(variants);
         productRepository.deleteById(id);
     }
 

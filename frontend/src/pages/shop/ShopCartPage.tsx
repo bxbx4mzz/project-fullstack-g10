@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FxLayout } from './components/FxLayout'
+import { FxAlert } from './components/FxAlert'
 import { userNavItems } from './components/navItems'
+import { rentalDurationHint, todayIso } from './components/calendarUtils'
 import {
   createBooking,
   fetchCart,
@@ -44,6 +46,7 @@ export function ShopCartPage() {
     if (qty < 1) return
     try {
       setCart(await updateCartItem(itemId, qty))
+      setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'แก้ไขจำนวนไม่สำเร็จ')
     }
@@ -52,14 +55,20 @@ export function ShopCartPage() {
   async function removeItem(itemId: number) {
     try {
       setCart(await removeCartItem(itemId))
+      setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ลบรายการไม่สำเร็จ')
     }
   }
 
   const items = cart?.items ?? []
+  const durationHint = rentalDurationHint(rentDate, returnDate)
   const canCheckout =
-    items.length > 0 && customerName.trim() && shippingAddress.trim() && rentDate && returnDate && !checkingOut
+    items.length > 0 &&
+    customerName.trim() &&
+    shippingAddress.trim() &&
+    durationHint?.ok &&
+    !checkingOut
 
   async function handleCheckout(e: React.FormEvent) {
     e.preventDefault()
@@ -74,7 +83,7 @@ export function ShopCartPage() {
         returnDate,
         shippingMethod,
       })
-      navigate('/shop/payment', { state: { bookingCode: booking.code, amount: booking.finalPrice } })
+      navigate(`/shop/payment/${booking.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'สร้างการจองไม่สำเร็จ')
     } finally {
@@ -88,9 +97,9 @@ export function ShopCartPage() {
       <p className="fx-page-subtitle">ตรวจสอบรายการ ใส่วันที่เช่า-คืน แล้วยืนยันการจอง</p>
 
       {error && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert title="ทำรายการไม่สำเร็จ" onClose={() => setError(null)}>
           {error}
-        </div>
+        </FxAlert>
       )}
 
       {loading && <p className="fx-page-subtitle">กำลังโหลด...</p>}
@@ -113,14 +122,29 @@ export function ShopCartPage() {
                     ฿{line.price}/3วัน • ไซส์ {line.size} • สี {line.color}
                   </span>
                 </div>
-                <div className="fx-cart-qty">
-                  <button type="button" onClick={() => changeQty(line.id, line.quantity - 1)}>
-                    −
-                  </button>
-                  {line.quantity}
-                  <button type="button" onClick={() => changeQty(line.id, line.quantity + 1)}>
-                    +
-                  </button>
+                <div className="fx-cart-qty-wrap">
+                  <div className="fx-cart-qty">
+                    <button
+                      type="button"
+                      onClick={() => changeQty(line.id, line.quantity - 1)}
+                      disabled={line.quantity <= 1}
+                      aria-label="ลดจำนวน"
+                    >
+                      −
+                    </button>
+                    {line.quantity}
+                    <button
+                      type="button"
+                      onClick={() => changeQty(line.id, line.quantity + 1)}
+                      disabled={line.quantity >= line.stockQty}
+                      aria-label="เพิ่มจำนวน"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span className={`fx-cart-stock-hint${line.quantity >= line.stockQty ? ' fx-at-limit' : ''}`}>
+                    {line.quantity >= line.stockQty ? `ครบจำนวนที่มี (${line.stockQty} ชิ้น)` : `มีทั้งหมด ${line.stockQty} ชิ้น`}
+                  </span>
                 </div>
                 <button type="button" className="fx-btn fx-btn-ghost" style={{ marginLeft: 8 }} onClick={() => removeItem(line.id)}>
                   ลบ
@@ -145,11 +169,28 @@ export function ShopCartPage() {
             </div>
             <div className="fx-field">
               <label htmlFor="fx-checkout-rent">วันที่เริ่มเช่า</label>
-              <input id="fx-checkout-rent" type="date" value={rentDate} onChange={(e) => setRentDate(e.target.value)} required />
+              <input
+                id="fx-checkout-rent"
+                type="date"
+                min={todayIso()}
+                value={rentDate}
+                onChange={(e) => setRentDate(e.target.value)}
+                required
+              />
             </div>
             <div className="fx-field">
               <label htmlFor="fx-checkout-return">วันที่คืน</label>
-              <input id="fx-checkout-return" type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} required />
+              <input
+                id="fx-checkout-return"
+                type="date"
+                min={rentDate || todayIso()}
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+                required
+              />
+              {durationHint && (
+                <span className={`fx-duration-hint${durationHint.ok ? '' : ' fx-duration-bad'}`}>{durationHint.text}</span>
+              )}
             </div>
             <div className="fx-field">
               <label htmlFor="fx-checkout-shipping">วิธีจัดส่ง</label>

@@ -4,11 +4,14 @@ import com.g10.rental.entity.Booking;
 import com.g10.rental.entity.BookingItem;
 import com.g10.rental.entity.BookingSource;
 import com.g10.rental.entity.BookingStatus;
+import com.g10.rental.entity.Payment;
+import com.g10.rental.entity.PaymentStatus;
 import com.g10.rental.entity.Cart;
 import com.g10.rental.entity.CartItem;
 import com.g10.rental.entity.ProductVariant;
 import com.g10.rental.entity.User;
 import com.g10.rental.repository.BookingRepository;
+import com.g10.rental.repository.PaymentRepository;
 import com.g10.rental.repository.CartRepository;
 import com.g10.rental.repository.UserRepository;
 import com.g10.rental.dto.booking.BookingItemResponse;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -31,10 +35,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingService {
 
+    static final ZoneId SHOP_ZONE = ZoneId.of("Asia/Bangkok");
+
     private final BookingRepository bookingRepository;
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final AvailabilityService availabilityService;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public BookingResponse createBooking(Authentication authentication, CreateBookingRequest request) {
@@ -45,7 +52,7 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new IllegalArgumentException("ตะกร้ายังว่างอยู่ กรุณาเพิ่มชุดก่อนยืนยันการจอง");
         }
 
         Booking booking = Booking.builder()
@@ -73,7 +80,8 @@ public class BookingService {
                     variant.getId(), request.getRentDate(), request.getReturnDate());
 
             if (availability.getAvailableQty() < quantity) {
-                throw new RuntimeException("Not enough availability for variant " + variant.getId());
+                throw new IllegalArgumentException("ไซซ์ " + variant.getSize() + " / สี " + variant.getColor()
+                        + " ว่างในช่วงวันที่เลือกเพียง " + availability.getAvailableQty() + " ชิ้น กรุณาลดจำนวนหรือเปลี่ยนวันที่");
             }
 
             BigDecimal unitPrice = calculateRentalPrice(variant, request.getRentDate(), request.getReturnDate());
@@ -94,6 +102,7 @@ public class BookingService {
         booking.setFinalPrice(totalPrice);
 
         Booking savedBooking = bookingRepository.save(booking);
+        paymentRepository.save(Payment.unpaidFor(savedBooking));
 
         cart.getItems().clear();
 
@@ -122,23 +131,39 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         if (booking.getStatus() == BookingStatus.CANCELLED) {
-            throw new RuntimeException("Booking is already cancelled");
+            throw new IllegalArgumentException("การจองนี้ถูกยกเลิกไปแล้ว");
         }
         if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new RuntimeException("Only pending booking can be cancelled");
+            throw new IllegalArgumentException("ยกเลิกได้เฉพาะการจองที่ยังไม่ได้ชำระเงินเท่านั้น");
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
+        paymentRepository.findByBookingId(booking.getId()).ifPresent(p -> p.setStatus(PaymentStatus.CANCELLED));
         return toResponse(bookingRepository.save(booking));
     }
 
-    private void validateDates(LocalDate rentDate, LocalDate returnDate) {
+    static void validateDates(LocalDate rentDate, LocalDate returnDate) {
         if (rentDate == null || returnDate == null) {
-            throw new IllegalArgumentException("Rent date and return date are required");
+            throw new IllegalArgumentException("กรุณาเลือกวันที่เช่าและวันที่คืน");
+        }
+        if (rentDate.isBefore(LocalDate.now(SHOP_ZONE))) {
+            throw new IllegalArgumentException("วันที่เช่าต้องไม่ใช่วันที่ผ่านไปแล้ว");
         }
         if (rentDate.isAfter(returnDate)) {
-            throw new IllegalArgumentException("Rent date must be before or equal to return date");
+            throw new IllegalArgumentException("วันที่คืนต้องไม่อยู่ก่อนวันที่เช่า");
         }
+        long rentalDays = ChronoUnit.DAYS.between(rentDate, returnDate) + 1;
+        if (!isSupportedDuration(rentalDays)) {
+            throw new IllegalArgumentException(unsupportedDurationMessage(rentalDays));
+        }
+    }
+
+    private static boolean isSupportedDuration(long days) {
+        return days == 3 || days == 5 || days >= 7;
+    }
+
+    private static String unsupportedDurationMessage(long days) {
+        return "เช่าได้แบบ 3 วัน, 5 วัน หรือ 7 วันขึ้นไปเท่านั้น (ตอนนี้เลือกไว้ " + days + " วัน นับรวมวันรับและวันคืน)";
     }
 
     static BigDecimal calculateRentalPrice(ProductVariant variant, LocalDate rentDate, LocalDate returnDate) {
@@ -152,7 +177,7 @@ public class BookingService {
             return variant.getPrice7Day().add(variant.getExtraDayPrice().multiply(BigDecimal.valueOf(extraDays)));
         }
 
-        throw new IllegalArgumentException("Rental duration must be at least 3 days");
+        throw new IllegalArgumentException(unsupportedDurationMessage(rentalDays));
     }
 
     private User getCurrentUser(Authentication authentication) {

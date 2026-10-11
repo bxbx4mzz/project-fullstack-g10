@@ -17,5 +17,6 @@ public class CartItemResponse {
     private String color;
     private BigDecimal price;
     private Integer quantity;
+    private Integer stockQty;
     private BigDecimal subtotal;
 }

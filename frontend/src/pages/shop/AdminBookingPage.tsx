@@ -6,6 +6,8 @@ import { useEnsureProductsLoaded, useProducts, type Product } from './components
 import { VariantPickerModal } from './components/VariantPickerModal'
 import { ProductThumb } from './components/ProductThumb'
 import { createStaffBooking } from '../../lib/api'
+import { FxAlert } from './components/FxAlert'
+import { rentalDurationHint, todayIso } from './components/calendarUtils'
 
 type BookingLine = {
   variantId: number
@@ -54,7 +56,8 @@ export function AdminBookingPage({
     setLines((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const canSubmit = customerName.trim() && rentDate && returnDate && lines.length > 0 && !submitting
+  const durationHint = rentalDurationHint(rentDate, returnDate)
+  const canSubmit = customerName.trim() && durationHint?.ok && lines.length > 0 && !submitting
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -87,9 +90,9 @@ export function AdminBookingPage({
       </p>
 
       {error && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert onClose={() => setError(null)}>
           {error}
-        </div>
+        </FxAlert>
       )}
 
       <form onSubmit={handleSubmit}>
@@ -107,17 +110,28 @@ export function AdminBookingPage({
           </div>
           <div className="fx-field">
             <label htmlFor="fx-booking-rent">วันที่เริ่มเช่า</label>
-            <input id="fx-booking-rent" type="date" value={rentDate} onChange={(e) => setRentDate(e.target.value)} required />
+            <input
+              id="fx-booking-rent"
+              type="date"
+              min={todayIso()}
+              value={rentDate}
+              onChange={(e) => setRentDate(e.target.value)}
+              required
+            />
           </div>
           <div className="fx-field">
             <label htmlFor="fx-booking-return">วันที่ต้องคืน</label>
             <input
               id="fx-booking-return"
               type="date"
+              min={rentDate || todayIso()}
               value={returnDate}
               onChange={(e) => setReturnDate(e.target.value)}
               required
             />
+            {durationHint && (
+              <span className={`fx-duration-hint${durationHint.ok ? '' : ' fx-duration-bad'}`}>{durationHint.text}</span>
+            )}
           </div>
         </div>
 

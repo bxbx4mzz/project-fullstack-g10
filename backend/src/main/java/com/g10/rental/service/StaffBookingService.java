@@ -4,9 +4,11 @@ import com.g10.rental.entity.Booking;
 import com.g10.rental.entity.BookingItem;
 import com.g10.rental.entity.BookingSource;
 import com.g10.rental.entity.BookingStatus;
+import com.g10.rental.entity.PaymentStatus;
 import com.g10.rental.entity.Product;
 import com.g10.rental.entity.ProductVariant;
 import com.g10.rental.repository.BookingRepository;
+import com.g10.rental.repository.PaymentRepository;
 import com.g10.rental.repository.ProductRepository;
 import com.g10.rental.repository.ProductVariantRepository;
 import com.g10.rental.dto.availability.AvailabilityResponse;
@@ -36,6 +38,7 @@ public class StaffBookingService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductRepository productRepository;
     private final AvailabilityService availabilityService;
+    private final PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> listAll() {
@@ -50,15 +53,23 @@ public class StaffBookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
 
+        boolean awaitingPayment = booking.getStatus() == BookingStatus.PENDING && booking.getSource() == BookingSource.ONLINE;
+        if (awaitingPayment && request.status() != BookingStatus.CANCELLED) {
+            throw new IllegalArgumentException("ลูกค้ายังไม่ได้ชำระเงิน จึงยังเปลี่ยนสถานะไม่ได้ (ยกเลิกได้อย่างเดียว)");
+        }
+
         booking.setStatus(request.status());
+        if (request.status() == BookingStatus.CANCELLED) {
+            paymentRepository.findByBookingId(booking.getId())
+                    .filter(p -> p.getStatus() != PaymentStatus.PAID)
+                    .ifPresent(p -> p.setStatus(PaymentStatus.CANCELLED));
+        }
         return BookingService.toResponse(bookingRepository.save(booking));
     }
 
     @Transactional
     public BookingResponse createInStoreBooking(CreateStaffBookingRequest request) {
-        if (request.getRentDate().isAfter(request.getReturnDate())) {
-            throw new IllegalArgumentException("Rent date must be before or equal to return date");
-        }
+        BookingService.validateDates(request.getRentDate(), request.getReturnDate());
 
         Booking booking = Booking.builder()
                 .code(BookingService.generateBookingCode(bookingRepository))
@@ -82,13 +93,14 @@ public class StaffBookingService {
 
         for (CreateStaffBookingRequest.Item item : request.getItems()) {
             ProductVariant variant = productVariantRepository.findById(item.getVariantId())
-                    .orElseThrow(() -> new RuntimeException("Product variant not found: " + item.getVariantId()));
+                    .orElseThrow(() -> new IllegalArgumentException("ไม่พบชุดที่เลือก (variant " + item.getVariantId() + ")"));
 
             AvailabilityResponse availability = availabilityService.checkAvailability(
                     variant.getId(), request.getRentDate(), request.getReturnDate());
 
             if (availability.getAvailableQty() < item.getQty()) {
-                throw new RuntimeException("Not enough availability for variant " + variant.getId());
+                throw new IllegalArgumentException("ไซซ์ " + variant.getSize() + " / สี " + variant.getColor()
+                        + " ว่างในช่วงวันที่เลือกเพียง " + availability.getAvailableQty() + " ชิ้น");
             }
 
             BigDecimal unitPrice = BookingService.calculateRentalPrice(variant, request.getRentDate(), request.getReturnDate());
@@ -104,6 +116,9 @@ public class StaffBookingService {
             totalPrice = totalPrice.add(subtotal);
         }
 
+        if (booking.getDiscount().compareTo(totalPrice) > 0) {
+            throw new IllegalArgumentException("ส่วนลด (" + booking.getDiscount() + " บาท) มากกว่ายอดรวม (" + totalPrice + " บาท) ไม่ได้");
+        }
         booking.setTotalPrice(totalPrice);
         booking.setFinalPrice(totalPrice.subtract(booking.getDiscount()));
 
@@ -115,7 +130,7 @@ public class StaffBookingService {
         List<Booking> all = bookingRepository.findAll();
 
         BigDecimal totalRevenue = all.stream()
-                .filter(b -> b.getStatus() != BookingStatus.CANCELLED)
+                .filter(b -> b.getStatus() != BookingStatus.CANCELLED && b.getStatus() != BookingStatus.PENDING)
                 .map(Booking::getFinalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

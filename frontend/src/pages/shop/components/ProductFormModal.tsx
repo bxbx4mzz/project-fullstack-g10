@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { addCategory, addProduct, useCategories } from './store'
+import { FxAlert } from './FxAlert'
+import { uploadProductImage } from '../../../lib/api'
 
 type ProductFormModalProps = {
   onClose: () => void
@@ -20,6 +22,7 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
   const [sizes, setSizes] = useState('Free Size')
   const [colors, setColors] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   function handleAddCategory() {
@@ -30,20 +33,34 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
     setNewCategory('')
   }
 
-  function handleImageFile(file: File | undefined) {
+  async function handleImageFile(file: File | undefined) {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = reader.result as string
-      setImageUrl(dataUrl)
-      setImagePreview(dataUrl)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('รูปภาพต้องมีขนาดไม่เกิน 5 MB')
+      return
     }
-    reader.readAsDataURL(file)
+    setError(null)
+    setImagePreview(URL.createObjectURL(file))
+    setImageUrl('')
+    setUploading(true)
+    try {
+      setImageUrl(await uploadProductImage(file))
+    } catch (err) {
+      setImagePreview(null)
+      setError(err instanceof Error ? err.message : 'อัปโหลดรูปไม่สำเร็จ')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  function clearImage() {
+    setImagePreview(null)
+    setImageUrl('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim() || pricePerDay <= 0 || submitting) return
+    if (!name.trim() || pricePerDay <= 0 || submitting || uploading) return
 
     setSubmitting(true)
     setError(null)
@@ -76,9 +93,9 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
         <h2 style={{ marginTop: 0 }}>Add product</h2>
 
         {error && (
-          <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 14 }}>
+          <FxAlert onClose={() => setError(null)}>
             {error}
-          </div>
+          </FxAlert>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -109,15 +126,28 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
             <input
               id="fx-pf-image-file"
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               onChange={(e) => handleImageFile(e.target.files?.[0])}
             />
+            <span className="fx-page-subtitle" style={{ fontSize: '0.78rem' }}>
+              JPG, PNG หรือ WebP ขนาดไม่เกิน 5 MB
+            </span>
             {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="ตัวอย่างรูปสินค้า"
-                style={{ marginTop: 10, width: 96, height: 96, objectFit: 'cover', borderRadius: 10 }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
+                <img
+                  src={imagePreview}
+                  alt="ตัวอย่างรูปสินค้า"
+                  style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, opacity: uploading ? 0.5 : 1 }}
+                />
+                <div>
+                  <p className="fx-page-subtitle" style={{ margin: '0 0 6px' }}>
+                    {uploading ? 'กำลังอัปโหลด...' : 'อัปโหลดแล้ว ✓'}
+                  </p>
+                  <button type="button" className="fx-btn fx-btn-ghost" onClick={clearImage} disabled={uploading}>
+                    เอารูปออก
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 
@@ -181,8 +211,8 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
             </div>
           </div>
 
-          <button type="submit" className="fx-btn" style={{ width: '100%', marginTop: 20 }} disabled={submitting}>
-            {submitting ? 'กำลังบันทึก...' : 'บันทึกสินค้า'}
+          <button type="submit" className="fx-btn" style={{ width: '100%', marginTop: 20 }} disabled={submitting || uploading}>
+            {submitting ? 'กำลังบันทึก...' : uploading ? 'รออัปโหลดรูป...' : 'บันทึกสินค้า'}
           </button>
         </form>
       </div>

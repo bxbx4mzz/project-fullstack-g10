@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AvailabilityService {
 
-    private static final int RETURN_BUFFER_DAYS = 2;
+    static final int RETURN_BUFFER_DAYS = 2;
 
     private final ProductVariantRepository productVariantRepository;
     private final BookingItemRepository bookingItemRepository;

@@ -1,5 +1,6 @@
 package com.g10.rental.controller;
 
+import jakarta.validation.Valid;
 import com.g10.rental.service.ProductService;
 import com.g10.rental.dto.product.CreateProductRequest;
 import com.g10.rental.dto.product.ProductResponse;
@@ -33,13 +34,13 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    public ProductResponse createProduct(@RequestBody CreateProductRequest request) {
+    public ProductResponse createProduct(@Valid @RequestBody CreateProductRequest request) {
         return productService.createProduct(request);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    public ProductResponse updateProduct(@PathVariable Long id, @RequestBody UpdateProductRequest request) {
+    public ProductResponse updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
         return productService.updateProduct(id, request);
     }
 

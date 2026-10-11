@@ -14,6 +14,7 @@ import {
 import { ProductDetailModal } from './components/ProductDetailModal'
 import { VariantPickerModal } from './components/VariantPickerModal'
 import { ProductThumb } from './components/ProductThumb'
+import { FxAlert } from './components/FxAlert'
 
 export function ShopHomePage() {
   useEnsureProductsLoaded()
@@ -59,9 +60,9 @@ export function ShopHomePage() {
       )}
 
       {productsError && (
-        <div className="fx-card" style={{ borderColor: 'var(--fx-danger)', color: 'var(--fx-danger)', marginBottom: 16 }}>
+        <FxAlert>
           {productsError}
-        </div>
+        </FxAlert>
       )}
 
       {filteredProducts.length === 0 && !productsError && <p className="fx-page-subtitle">ไม่พบสินค้าที่ตรงกับ "{query}"</p>}
