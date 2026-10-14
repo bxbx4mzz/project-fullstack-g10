@@ -9,7 +9,11 @@ Thumbs.db
 
 # --- Backend (Maven / Java) ---
 backend/target/
+
 backend/uploads/
+!backend/uploads/demo_products/
+!backend/uploads/demo_products/**
+
 backend/.mvn/wrapper/maven-wrapper.jar
 *.class
 *.log
