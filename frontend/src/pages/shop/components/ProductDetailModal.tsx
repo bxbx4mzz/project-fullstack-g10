@@ -1,11 +1,18 @@
 import { useState } from 'react'
-import type { Product } from './store'
-import { ProductThumb } from './ProductThumb'
+import { isImageUrl, type Product } from './store'
 import { resolveImageUrl } from '../../../lib/api'
 
 type ProductDetailModalProps = {
   product: Product
   onClose: () => void
+}
+
+function GalleryImage({ src, fallback, className }: { src: string; fallback: string; className?: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed || !isImageUrl(src)) {
+    return <span className={`fx-gallery-fallback ${className ?? ''}`}>{isImageUrl(fallback) ? '👕' : fallback}</span>
+  }
+  return <img className={className} src={resolveImageUrl(src)} alt="" onError={() => setFailed(true)} />
 }
 
 export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
@@ -19,80 +26,82 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
   return (
     <div className="fx-modal-backdrop" onClick={onClose}>
-      <div className="fx-modal-card" onClick={(e) => e.stopPropagation()}>
+      <div className="fx-modal-card fx-detail-modal" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="fx-modal-close" onClick={onClose} aria-label="ปิด">
           ✕
         </button>
 
-        <div className="fx-gallery">
-          <ProductThumb key={current} icon={current} style={{ height: 260, fontSize: '3rem' }} />
+        <div className="fx-detail-gallery">
+          <div className="fx-gallery-main">
+            <GalleryImage key={current} src={current} fallback={product.icon} />
+            {images.length > 1 && (
+              <>
+                <button type="button" className="fx-gallery-nav fx-gallery-prev" onClick={() => shift(-1)} aria-label="รูปก่อนหน้า">
+                  ‹
+                </button>
+                <button type="button" className="fx-gallery-nav fx-gallery-next" onClick={() => shift(1)} aria-label="รูปถัดไป">
+                  ›
+                </button>
+                <span className="fx-gallery-count">
+                  {index + 1}/{images.length}
+                </span>
+              </>
+            )}
+          </div>
+
           {images.length > 1 && (
-            <>
-              <button type="button" className="fx-gallery-nav fx-gallery-prev" onClick={() => shift(-1)} aria-label="รูปก่อนหน้า">
-                ‹
-              </button>
-              <button type="button" className="fx-gallery-nav fx-gallery-next" onClick={() => shift(1)} aria-label="รูปถัดไป">
-                ›
-              </button>
-              <span className="fx-gallery-count">
-                {index + 1} / {images.length}
-              </span>
-            </>
+            <div className="fx-gallery-thumbs">
+              {images.map((url, i) => (
+                <button
+                  type="button"
+                  key={`${url}-${i}`}
+                  className={`fx-gallery-thumb${i === index ? ' active' : ''}`}
+                  onClick={() => setIndex(i)}
+                  onMouseEnter={() => setIndex(i)}
+                  aria-label={`ดูรูปที่ ${i + 1}`}
+                >
+                  <GalleryImage src={url} fallback={product.icon} />
+                </button>
+              ))}
+            </div>
           )}
         </div>
-        {images.length > 1 && (
-          <div className="fx-gallery-thumbs">
-            {images.map((url, i) => (
-              <button
-                type="button"
-                key={`${url}-${i}`}
-                className={`fx-gallery-thumb${i === index ? ' active' : ''}`}
-                onClick={() => setIndex(i)}
-                aria-label={`ดูรูปที่ ${i + 1}`}
-              >
-                <img src={resolveImageUrl(url)} alt="" />
-              </button>
-            ))}
+
+        <div className="fx-detail-info">
+          <h2 className="fx-detail-name">{product.name}</h2>
+          <div className="fx-detail-price">{product.price}</div>
+          {product.description && <p className="fx-detail-desc">{product.description}</p>}
+
+          <div className="fx-detail-row">
+            <span className="fx-detail-label">หมวดหมู่</span>
+            <span className="fx-user-badge">{product.category}</span>
           </div>
-        )}
 
-        <h2 style={{ margin: '14px 0 2px' }}>{product.name}</h2>
-        <div className="fx-product-price" style={{ fontSize: '1.1rem' }}>
-          {product.price}
-        </div>
-        <p className="fx-page-subtitle" style={{ marginTop: 8 }}>
-          {product.description}
-        </p>
-
-        <div className="fx-detail-row">
-          <span className="fx-detail-label">หมวดหมู่</span>
-          <span className="fx-user-badge">{product.category}</span>
-        </div>
-
-        <div className="fx-detail-row">
-          <span className="fx-detail-label">คงเหลือ</span>
-          <span>{product.stock} ตัว</span>
-        </div>
-
-        <div className="fx-detail-row">
-          <span className="fx-detail-label">ไซส์</span>
-          <div className="fx-tag-row">
-            {product.sizes.map((s) => (
-              <span className="fx-tag" key={s}>
-                {s}
-              </span>
-            ))}
+          <div className="fx-detail-row">
+            <span className="fx-detail-label">คงเหลือ</span>
+            <span>{product.stock} ตัว</span>
           </div>
-        </div>
 
-        <div className="fx-detail-row">
-          <span className="fx-detail-label">สี</span>
-          <div className="fx-tag-row">
-            {product.colors.map((c) => (
-              <span className="fx-tag" key={c}>
-                {c}
-              </span>
-            ))}
+          <div className="fx-detail-row">
+            <span className="fx-detail-label">ไซส์</span>
+            <div className="fx-tag-row">
+              {product.sizes.map((s) => (
+                <span className="fx-tag" key={s}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="fx-detail-row">
+            <span className="fx-detail-label">สี</span>
+            <div className="fx-tag-row">
+              {product.colors.map((c) => (
+                <span className="fx-tag" key={c}>
+                  {c}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>

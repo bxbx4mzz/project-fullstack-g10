@@ -80,65 +80,85 @@ export function ImageListEditor({ images, onChange, onUploadingChange, onError }
   }
 
   return (
-    <div>
-      {images.length > 0 && (
-        <div className="fx-image-grid">
-          {images.map((url, i) => (
-            <div className={`fx-image-tile${i === 0 ? ' fx-image-cover' : ''}`} key={`${url}-${i}`}>
-              <img src={resolveImageUrl(url)} alt={`รูปที่ ${i + 1}`} />
-              {i === 0 && <span className="fx-image-badge">รูปหลัก</span>}
-              <div className="fx-image-actions">
-                <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="เลื่อนไปซ้าย">
-                  ‹
-                </button>
-                {i !== 0 && (
-                  <button type="button" onClick={() => makeCover(i)} aria-label="ตั้งเป็นรูปหลัก" title="ตั้งเป็นรูปหลัก">
-                    ★
-                  </button>
-                )}
-                <button type="button" onClick={() => move(i, 1)} disabled={i === images.length - 1} aria-label="เลื่อนไปขวา">
-                  ›
-                </button>
+    <div className="fx-image-editor">
+      <div className="fx-image-grid">
+        {images.map((url, i) => (
+          <div className={`fx-image-tile${i === 0 ? ' fx-image-cover' : ''}`} key={`${url}-${i}`}>
+            <TileImage url={url} index={i} />
+            {i === 0 && <span className="fx-image-badge">รูปหลัก</span>}
+            <button
+              type="button"
+              className="fx-image-icon fx-image-remove"
+              onClick={() => onChange(images.filter((_, j) => j !== i))}
+              aria-label="ลบรูป"
+              title="ลบรูป"
+            >
+              ✕
+            </button>
+            <div className="fx-image-actions">
+              <button type="button" className="fx-image-icon" onClick={() => move(i, -1)} disabled={i === 0} aria-label="เลื่อนไปซ้าย" title="เลื่อนไปซ้าย">
+                ‹
+              </button>
+              {i !== 0 && (
                 <button
                   type="button"
-                  className="fx-image-remove"
-                  onClick={() => onChange(images.filter((_, j) => j !== i))}
-                  aria-label="ลบรูป"
+                  className="fx-image-icon fx-image-make-cover"
+                  onClick={() => makeCover(i)}
+                  aria-label="ตั้งเป็นรูปหลัก"
+                  title="ตั้งเป็นรูปหลัก"
                 >
-                  ✕
+                  ★
                 </button>
-              </div>
+              )}
+              <button
+                type="button"
+                className="fx-image-icon"
+                onClick={() => move(i, 1)}
+                disabled={i === images.length - 1}
+                aria-label="เลื่อนไปขวา"
+                title="เลื่อนไปขวา"
+              >
+                ›
+              </button>
             </div>
-          ))}
-          {Array.from({ length: uploading }).map((_, i) => (
-            <div className="fx-image-tile fx-image-loading" key={`loading-${i}`}>
-              กำลังอัปโหลด...
-            </div>
-          ))}
-        </div>
-      )}
-      {images.length === 0 && uploading > 0 && <p className="fx-page-subtitle">กำลังอัปโหลด {uploading} รูป...</p>}
+          </div>
+        ))}
+        {Array.from({ length: uploading }).map((_, i) => (
+          <div className="fx-image-tile fx-image-loading" key={`loading-${i}`}>
+            <span className="fx-image-spinner" />
+            กำลังอัปโหลด
+          </div>
+        ))}
+        {remaining > 0 && (
+          <label className="fx-image-add">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={(e) => {
+                void handleFiles(e.target.files)
+                e.target.value = ''
+              }}
+            />
+            <span className="fx-image-add-plus">+</span>
+            <span>เพิ่มรูป</span>
+            <span className="fx-image-add-count">
+              {images.length}/{MAX_IMAGES}
+            </span>
+          </label>
+        )}
+      </div>
 
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        multiple
-        disabled={remaining <= 0}
-        onChange={(e) => {
-          void handleFiles(e.target.files)
-          e.target.value = ''
-        }}
-      />
-      <span className="fx-page-subtitle" style={{ display: 'block', fontSize: '0.78rem', marginTop: 4 }}>
-        เลือกได้หลายรูปพร้อมกัน (JPG, PNG, WebP ไม่เกิน 5 MB ต่อรูป สูงสุด {MAX_IMAGES} รูป) — รูปแรกจะใช้เป็นรูปหน้าร้าน
-      </span>
+      <p className="fx-image-hint">
+        เลือกได้หลายรูปพร้อมกัน · JPG, PNG, WebP ไม่เกิน 5 MB ต่อรูป · <strong>รูปแรกคือรูปหน้าร้าน</strong>
+      </p>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+      <div className="fx-image-link-row">
         <input
           type="url"
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
-          placeholder="หรือวางลิงก์ไฟล์รูป https://...jpg"
+          placeholder="หรือวางลิงก์ไฟล์รูป เช่น https://.../dress.jpg"
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault()
@@ -146,10 +166,18 @@ export function ImageListEditor({ images, onChange, onUploadingChange, onError }
             }
           }}
         />
-        <button type="button" className="fx-btn fx-btn-ghost" onClick={addLink} disabled={!linkInput.trim()}>
+        <button type="button" className="fx-btn fx-btn-ghost" onClick={addLink} disabled={!linkInput.trim() || remaining <= 0}>
           เพิ่มลิงก์
         </button>
       </div>
     </div>
   )
+}
+
+function TileImage({ url, index }: { url: string; index: number }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) {
+    return <span className="fx-image-broken">โหลดรูปไม่ได้</span>
+  }
+  return <img src={resolveImageUrl(url)} alt={`รูปที่ ${index + 1}`} onError={() => setFailed(true)} />
 }

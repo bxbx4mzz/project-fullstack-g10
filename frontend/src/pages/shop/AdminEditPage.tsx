@@ -15,6 +15,7 @@ import {
 } from './components/store'
 import { ProductFormModal } from './components/ProductFormModal'
 import { ImageListEditor } from './components/ImageListEditor'
+import { ProductThumb } from './components/ProductThumb'
 import {
   createVariant,
   deleteProduct,
@@ -262,30 +263,34 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
   const totalStock = variants.reduce((sum, v) => sum + (Number(v.stockQty) || 0), 0)
   const originalVariants = active?.variants.map(toDraft) ?? []
 
-  function renderVariantInputs(v: VariantDraft, onPatch: (patch: Partial<VariantDraft>) => void) {
+  function renderVariantFields(v: VariantDraft, onPatch: (patch: Partial<VariantDraft>) => void) {
     return (
-      <>
-        <td>
+      <div className="fx-variant-fields">
+        <label className="fx-mini-field">
+          <span>ไซซ์</span>
           <input type="text" value={v.size} placeholder="Free Size" onChange={(e) => onPatch({ size: e.target.value })} />
-        </td>
-        <td>
+        </label>
+        <label className="fx-mini-field">
+          <span>สี</span>
           <input type="text" value={v.color} placeholder="-" onChange={(e) => onPatch({ color: e.target.value })} />
-        </td>
-        <td>
+        </label>
+        <label className="fx-mini-field">
+          <span>จำนวน (ชิ้น)</span>
           <input type="number" min={0} value={v.stockQty} onChange={(e) => onPatch({ stockQty: Number(e.target.value) })} />
-        </td>
-        {PRICE_FIELDS.map(({ key }) => (
-          <td key={key}>
+        </label>
+        {PRICE_FIELDS.map(({ key, label }) => (
+          <label className="fx-mini-field" key={key}>
+            <span>ราคา {label} (฿)</span>
             <input type="number" min={0} value={v[key]} onChange={(e) => onPatch({ [key]: Number(e.target.value) })} />
-          </td>
+          </label>
         ))}
-      </>
+      </div>
     )
   }
 
   return (
     <FxLayout brand={brand} navItems={navItems}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+      <div className="fx-edit-header">
         <div>
           <h1>แก้ไขสินค้า</h1>
           <p className="fx-page-subtitle">เลือกชุดจากรายการ แล้วแก้ไขรายละเอียดด้านขวา</p>
@@ -309,14 +314,19 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
                 className={`fx-edit-list-item${p.id === activeId ? ' active' : ''}`}
                 onClick={() => selectProduct(p.id)}
               >
-                <span>{p.name}</span>
-                <span>{p.price}</span>
+                <ProductThumb icon={p.icon} className="fx-edit-list-thumb" />
+                <span className="fx-edit-list-text">
+                  <span className="fx-edit-list-name">{p.name}</span>
+                  <span className="fx-edit-list-meta">
+                    {p.price} · {p.stock} ชิ้น
+                  </span>
+                </span>
               </button>
             ))}
           </div>
 
           {active && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+            <div className="fx-edit-panel">
               {error && <FxAlert onClose={() => setError(null)}>{error}</FxAlert>}
               {notice && (
                 <FxAlert tone="success" title="สำเร็จ" onClose={() => setNotice(null)}>
@@ -324,7 +334,7 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
                 </FxAlert>
               )}
 
-              <div className="fx-card">
+              <section className="fx-card">
                 <h2 className="fx-edit-section-title">ข้อมูลสินค้า</h2>
                 <div className="fx-field" style={{ marginTop: 0 }}>
                   <label htmlFor="fx-edit-name">ชื่อชุด</label>
@@ -334,144 +344,129 @@ export function AdminEditPage({ brand = 'Admin - Clothing Rental Shop', navItems
                   <label htmlFor="fx-edit-desc">รายละเอียด</label>
                   <textarea id="fx-edit-desc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
                 </div>
-                <div className="fx-field">
-                  <label htmlFor="fx-edit-category">หมวดหมู่</label>
-                  <select id="fx-edit-category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                    {categoryOptions.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <div className="fx-edit-grid-2">
+                  <div className="fx-field">
+                    <label htmlFor="fx-edit-category">หมวดหมู่</label>
+                    <select id="fx-edit-category" value={category} onChange={(e) => setCategory(e.target.value)}>
+                      {categoryOptions.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="fx-field">
+                    <label htmlFor="fx-edit-price">ราคาเช่าต่อวัน (฿) — แสดงหน้าร้าน</label>
                     <input
-                      type="text"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                      placeholder="เพิ่มหมวดหมู่ใหม่ เช่น accessories"
+                      id="fx-edit-price"
+                      type="number"
+                      min={0}
+                      value={pricePerDay}
+                      onChange={(e) => setPricePerDay(Number(e.target.value))}
                     />
-                    <button type="button" className="fx-btn fx-btn-ghost" onClick={handleAddCategory} disabled={!newCategory.trim()}>
-                      Add tag
-                    </button>
                   </div>
                 </div>
-                <div className="fx-field">
-                  <label htmlFor="fx-edit-price">ราคาเช่าต่อวัน (บาท) — ใช้แสดงหน้าร้าน</label>
+                <div className="fx-edit-inline-add">
                   <input
-                    id="fx-edit-price"
-                    type="number"
-                    min={0}
-                    value={pricePerDay}
-                    onChange={(e) => setPricePerDay(Number(e.target.value))}
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="เพิ่มหมวดหมู่ใหม่ เช่น accessories"
                   />
+                  <button type="button" className="fx-btn fx-btn-ghost" onClick={handleAddCategory} disabled={!newCategory.trim()}>
+                    + หมวดหมู่
+                  </button>
                 </div>
+              </section>
 
-                <div className="fx-field">
-                  <label>รูปสินค้า</label>
-                  <ImageListEditor images={images} onChange={setImages} onUploadingChange={setUploading} onError={setError} />
-                </div>
+              <section className="fx-card">
+                <h2 className="fx-edit-section-title">รูปสินค้า</h2>
+                <ImageListEditor images={images} onChange={setImages} onUploadingChange={setUploading} onError={setError} />
                 {images.length === 0 && (
                   <div className="fx-field">
                     <label htmlFor="fx-edit-icon">ไอคอนแทนรูป (ใช้เมื่อไม่มีรูป)</label>
                     <input id="fx-edit-icon" type="text" value={icon} placeholder="เช่น 👗" onChange={(e) => setIcon(e.target.value)} />
                   </div>
                 )}
+              </section>
 
-                <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-                  <button type="button" className="fx-btn" onClick={handleSave} disabled={saving || uploading || deleting}>
-                    {saving ? 'กำลังบันทึก...' : uploading ? 'รออัปโหลดรูป...' : 'บันทึกข้อมูลสินค้า'}
-                  </button>
-                </div>
+              <div className="fx-edit-savebar">
+                <span>บันทึกชื่อ รายละเอียด หมวดหมู่ ราคา และรูปภาพ</span>
+                <button type="button" className="fx-btn" onClick={handleSave} disabled={saving || uploading || deleting}>
+                  {saving ? 'กำลังบันทึก...' : uploading ? 'รออัปโหลดรูป...' : 'บันทึกข้อมูลสินค้า'}
+                </button>
               </div>
 
-              <div className="fx-card">
-                <h2 className="fx-edit-section-title">
-                  ไซซ์ / สี / จำนวน / ราคา
-                  <span className="fx-page-subtitle" style={{ fontWeight: 400, marginLeft: 8, fontSize: '0.85rem' }}>
-                    รวมคงเหลือ {totalStock} ชิ้น
-                  </span>
-                </h2>
-                <div className="fx-variant-table-wrap">
-                  <table className="fx-table fx-variant-table">
-                    <thead>
-                      <tr>
-                        <th>ไซซ์</th>
-                        <th>สี</th>
-                        <th>จำนวน</th>
-                        {PRICE_FIELDS.map(({ key, label }) => (
-                          <th key={key}>ราคา {label}</th>
-                        ))}
-                        <th />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {variants.map((v, i) => {
-                        const original = originalVariants.find((o) => o.id === v.id)
-                        const changed = !original || !sameVariant(original, v)
-                        return (
-                          <tr key={v.id}>
-                            {renderVariantInputs(v, (patch) => updateDraft(i, patch))}
-                            <td className="fx-variant-actions">
-                              <button
-                                type="button"
-                                className="fx-btn"
-                                onClick={() => saveVariant(v)}
-                                disabled={!changed || busyVariant !== null}
-                              >
-                                {busyVariant === v.id ? '...' : 'บันทึก'}
-                              </button>
-                              <button
-                                type="button"
-                                className="fx-btn fx-btn-ghost"
-                                onClick={() => removeVariant(v)}
-                                disabled={busyVariant !== null || variants.length <= 1}
-                                title={variants.length <= 1 ? 'ต้องมีไซซ์/สีอย่างน้อย 1 แบบ' : undefined}
-                              >
-                                ลบ
-                              </button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                      {newVariant && (
-                        <tr className="fx-variant-new">
-                          {renderVariantInputs(newVariant, (patch) => setNewVariant((d) => (d ? { ...d, ...patch } : d)))}
-                          <td className="fx-variant-actions">
-                            <button type="button" className="fx-btn" onClick={addVariant} disabled={busyVariant !== null}>
-                              {busyVariant === 'new' ? '...' : 'เพิ่ม'}
-                            </button>
-                            <button type="button" className="fx-btn fx-btn-ghost" onClick={() => setNewVariant(null)}>
-                              ยกเลิก
-                            </button>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+              <section className="fx-card">
+                <div className="fx-edit-section-head">
+                  <h2 className="fx-edit-section-title">ไซซ์ / สี / จำนวน / ราคา</h2>
+                  <span className="fx-user-badge">รวม {totalStock} ชิ้น</span>
                 </div>
-                {!newVariant && (
-                  <button
-                    type="button"
-                    className="fx-btn fx-btn-ghost"
-                    style={{ marginTop: 12 }}
-                    onClick={() => setNewVariant(newDraft(pricePerDay))}
-                  >
-                    + เพิ่มไซซ์/สี
-                  </button>
-                )}
-              </div>
+                <p className="fx-edit-section-note">แต่ละแบบกดบันทึกแยกกัน</p>
 
-              <div className="fx-card fx-danger-zone">
+                <div className="fx-variant-list">
+                  {variants.map((v, i) => {
+                    const original = originalVariants.find((o) => o.id === v.id)
+                    const changed = !original || !sameVariant(original, v)
+                    return (
+                      <div className={`fx-variant-row${changed ? ' fx-variant-changed' : ''}`} key={v.id}>
+                        {renderVariantFields(v, (patch) => updateDraft(i, patch))}
+                        <div className="fx-variant-actions">
+                          {changed && <span className="fx-variant-unsaved">ยังไม่ได้บันทึก</span>}
+                          <button
+                            type="button"
+                            className="fx-btn fx-btn-ghost fx-btn-sm"
+                            onClick={() => removeVariant(v)}
+                            disabled={busyVariant !== null || variants.length <= 1}
+                            title={variants.length <= 1 ? 'ต้องมีไซซ์/สีอย่างน้อย 1 แบบ' : undefined}
+                          >
+                            ลบ
+                          </button>
+                          <button
+                            type="button"
+                            className="fx-btn fx-btn-sm"
+                            onClick={() => saveVariant(v)}
+                            disabled={!changed || busyVariant !== null}
+                          >
+                            {busyVariant === v.id ? 'กำลังบันทึก...' : 'บันทึก'}
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  {newVariant ? (
+                    <div className="fx-variant-row fx-variant-new">
+                      <div className="fx-variant-new-title">ไซซ์/สีใหม่</div>
+                      {renderVariantFields(newVariant, (patch) => setNewVariant((d) => (d ? { ...d, ...patch } : d)))}
+                      <div className="fx-variant-actions">
+                        <button type="button" className="fx-btn fx-btn-ghost fx-btn-sm" onClick={() => setNewVariant(null)}>
+                          ยกเลิก
+                        </button>
+                        <button type="button" className="fx-btn fx-btn-sm" onClick={addVariant} disabled={busyVariant !== null}>
+                          {busyVariant === 'new' ? 'กำลังเพิ่ม...' : 'เพิ่ม'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button type="button" className="fx-variant-add" onClick={() => setNewVariant(newDraft(pricePerDay))}>
+                      + เพิ่มไซซ์/สี
+                    </button>
+                  )}
+                </div>
+              </section>
+
+              <section className="fx-card fx-danger-zone">
                 <div>
                   <strong>ลบสินค้านี้</strong>
-                  <p className="fx-page-subtitle" style={{ margin: '4px 0 0' }}>
+                  <p className="fx-edit-section-note" style={{ margin: '4px 0 0' }}>
                     ลบไม่ได้ถ้ายังมีการจองที่ยังไม่จบ — ชุดจะถูกเอาออกจากตะกร้าและชุดโปรดของลูกค้าด้วย
                   </p>
                 </div>
                 <button type="button" className="fx-btn fx-btn-danger" onClick={handleDelete} disabled={saving || deleting}>
                   {deleting ? 'กำลังลบ...' : 'ลบสินค้า'}
                 </button>
-              </div>
+              </section>
             </div>
           )}
         </div>

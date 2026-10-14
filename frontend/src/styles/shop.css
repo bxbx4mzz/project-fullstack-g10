@@ -152,130 +152,270 @@
   @apply cursor-pointer;
 }
 
+/* ---------- image editor ---------- */
 .fx-image-grid {
-  @apply mb-3 grid gap-2.5;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  @apply grid gap-3;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
 }
 
 .fx-image-tile {
-  @apply relative aspect-square overflow-hidden rounded-lg border;
+  @apply relative aspect-square overflow-hidden rounded-xl border;
   border-color: var(--fx-border);
   background: var(--fx-surface-soft);
 }
 
 .fx-image-tile img {
-  @apply h-full w-full object-cover;
+  @apply block h-full w-full object-cover;
 }
 
 .fx-image-tile.fx-image-cover {
-  @apply border-2;
+  box-shadow: 0 0 0 2px var(--fx-accent);
   border-color: var(--fx-accent);
 }
 
-.fx-image-loading {
-  @apply flex items-center justify-center text-[0.75rem];
-  color: var(--fx-text-muted);
+.fx-image-broken {
+  @apply flex h-full items-center justify-center p-2 text-center text-[0.75rem];
+  color: var(--fx-danger);
 }
 
 .fx-image-badge {
-  @apply absolute left-1 top-1 rounded-md px-1.5 py-0.5 text-[0.68rem] font-semibold text-white;
+  @apply absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 text-[0.68rem] font-semibold text-white;
   background: var(--fx-accent);
 }
 
-.fx-image-actions {
-  @apply absolute inset-x-0 bottom-0 flex justify-center gap-1 p-1;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.fx-image-actions button {
-  @apply h-6 w-6 cursor-pointer rounded border-0 text-[0.8rem] leading-none text-white;
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.fx-image-actions button:disabled {
-  @apply cursor-default opacity-30;
-}
-
-.fx-image-actions button.fx-image-remove {
-  background: var(--fx-danger);
-}
-
-.fx-gallery {
-  @apply relative;
-}
-
-.fx-gallery-nav {
-  @apply absolute top-1/2 h-9 w-9 -translate-y-1/2 cursor-pointer rounded-full border-0 text-xl leading-none;
-  background: rgba(255, 255, 255, 0.85);
+.fx-image-icon {
+  @apply inline-flex h-7 min-w-7 cursor-pointer items-center justify-center rounded-full border-0 px-1.5 text-[0.85rem] leading-none;
+  background: rgba(255, 255, 255, 0.92);
   color: var(--fx-text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.fx-gallery-prev {
-  @apply left-2;
+.fx-image-icon:disabled {
+  @apply cursor-default opacity-35;
 }
 
-.fx-gallery-next {
-  @apply right-2;
+.fx-image-icon.fx-image-remove {
+  @apply absolute right-1.5 top-1.5 h-6 min-w-6 text-[0.7rem];
+  color: var(--fx-danger);
 }
 
-.fx-gallery-count {
-  @apply absolute bottom-2 right-2 rounded-full px-2 py-0.5 text-[0.72rem] text-white;
-  background: rgba(0, 0, 0, 0.5);
+.fx-image-icon.fx-image-make-cover {
+  color: var(--fx-accent);
 }
 
-.fx-gallery-thumbs {
-  @apply mt-2 flex gap-1.5 overflow-x-auto pb-1;
+.fx-image-actions {
+  @apply absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-1.5;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent);
 }
 
-.fx-gallery-thumb {
-  @apply h-14 w-14 shrink-0 cursor-pointer overflow-hidden rounded-md border-2 p-0 opacity-60;
-  border-color: transparent;
-  background: var(--fx-surface-soft);
+.fx-image-loading {
+  @apply flex flex-col items-center justify-center gap-2 text-[0.75rem];
+  color: var(--fx-text-muted);
 }
 
-.fx-gallery-thumb img {
-  @apply h-full w-full object-cover;
+.fx-image-spinner {
+  @apply h-5 w-5 rounded-full border-2;
+  border-color: var(--fx-border);
+  border-top-color: var(--fx-accent);
+  animation: fx-spin 0.8s linear infinite;
 }
 
-.fx-gallery-thumb.active {
-  @apply opacity-100;
+@keyframes fx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fx-image-add {
+  @apply flex aspect-square cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-dashed text-[0.82rem] font-semibold;
   border-color: var(--fx-accent);
+  background: var(--fx-surface);
+  color: var(--fx-accent-dark);
 }
 
-.fx-edit-section-title {
-  @apply mb-3 mt-0 text-[1.05rem];
+.fx-image-add:hover {
+  background: var(--fx-accent-soft);
 }
 
-.fx-variant-table-wrap {
-  @apply overflow-x-auto;
+.fx-image-add input {
+  @apply hidden;
 }
 
-.fx-variant-table th {
-  @apply whitespace-nowrap text-[0.78rem];
+.fx-image-add-plus {
+  @apply text-[1.6rem] font-normal leading-none;
 }
 
-.fx-variant-table td {
-  @apply p-1;
+.fx-image-add-count {
+  @apply text-[0.72rem] font-normal;
+  color: var(--fx-text-muted);
 }
 
-.fx-variant-table input {
-  @apply w-full min-w-[64px] rounded-md border px-2 py-1.5 text-[0.85rem];
+.fx-image-hint {
+  @apply mb-0 mt-2.5 text-[0.78rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-image-link-row {
+  @apply mt-3 flex gap-2;
+}
+
+.fx-image-link-row input {
+  @apply min-w-0 flex-1 rounded-lg border px-3 py-2 text-[0.88rem];
   border-color: var(--fx-border);
   background: var(--fx-bg);
   color: var(--fx-text);
 }
 
-.fx-variant-table .fx-variant-actions {
-  @apply flex gap-1 whitespace-nowrap;
+.fx-image-link-row .fx-btn {
+  @apply shrink-0 whitespace-nowrap;
 }
 
-.fx-variant-table .fx-variant-actions .fx-btn {
-  @apply px-2.5 py-1.5 text-[0.8rem];
+/* ---------- edit page ---------- */
+.fx-edit-header {
+  @apply mb-2 flex items-center justify-between gap-3;
 }
 
-.fx-variant-new td {
+.fx-edit-panel {
+  @apply flex min-w-0 flex-col gap-4;
+}
+
+.fx-edit-panel .fx-alert {
+  @apply mb-0;
+}
+
+.fx-edit-section-title {
+  @apply m-0 mb-3.5 text-[1.02rem];
+}
+
+.fx-edit-section-head {
+  @apply flex items-center justify-between gap-3;
+}
+
+.fx-edit-section-head .fx-edit-section-title {
+  @apply mb-0;
+}
+
+.fx-edit-section-note {
+  @apply mb-3.5 mt-1 text-[0.8rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-edit-grid-2 {
+  @apply grid gap-x-4;
+  grid-template-columns: 1fr 1fr;
+}
+
+.fx-edit-inline-add {
+  @apply mt-2.5 flex gap-2;
+}
+
+.fx-edit-inline-add input {
+  @apply min-w-0 flex-1 rounded-lg border px-3 py-2 text-[0.88rem];
+  border-color: var(--fx-border);
+  background: var(--fx-bg);
+  color: var(--fx-text);
+}
+
+.fx-edit-savebar {
+  @apply sticky bottom-3 z-10 flex items-center justify-between gap-3 rounded-xl border px-4 py-3;
+  border-color: var(--fx-accent);
+  background: var(--fx-accent-soft);
+  box-shadow: 0 4px 14px rgba(63, 58, 52, 0.12);
+}
+
+.fx-edit-savebar span {
+  @apply text-[0.85rem];
+  color: var(--fx-accent-dark);
+}
+
+.fx-btn.fx-btn-sm {
+  @apply px-3.5 py-1.5 text-[0.82rem];
+}
+
+.fx-btn:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.fx-variant-list {
+  @apply flex flex-col gap-3;
+}
+
+.fx-variant-row {
+  @apply rounded-xl border p-3.5;
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-variant-row.fx-variant-changed {
+  border-color: var(--fx-accent);
+}
+
+.fx-variant-row.fx-variant-new {
+  @apply border-dashed;
+  border-color: var(--fx-accent);
   background: var(--fx-surface-soft);
+}
+
+.fx-variant-new-title {
+  @apply mb-2 text-[0.85rem] font-semibold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-variant-fields {
+  @apply grid gap-2.5;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.fx-variant-fields .fx-mini-field:nth-child(-n + 3) {
+  grid-column: span 4;
+}
+
+.fx-variant-fields .fx-mini-field:nth-child(n + 4) {
+  grid-column: span 3;
+}
+
+.fx-mini-field {
+  @apply flex min-w-0 flex-col gap-1;
+}
+
+.fx-mini-field span {
+  @apply truncate text-[0.72rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-mini-field input {
+  @apply w-full min-w-0 rounded-lg border px-2.5 py-2 text-[0.88rem];
+  border-color: var(--fx-border);
+  background: var(--fx-bg);
+  color: var(--fx-text);
+}
+
+.fx-mini-field input:focus,
+.fx-image-link-row input:focus,
+.fx-edit-inline-add input:focus {
+  outline: 2px solid var(--fx-accent);
+  outline-offset: 1px;
+}
+
+.fx-variant-actions {
+  @apply mt-3 flex items-center justify-end gap-2;
+}
+
+.fx-variant-unsaved {
+  @apply mr-auto text-[0.75rem] font-semibold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-variant-add {
+  @apply cursor-pointer rounded-xl border-2 border-dashed px-4 py-3 text-[0.88rem] font-semibold;
+  border-color: var(--fx-border);
+  background: transparent;
+  color: var(--fx-accent-dark);
+}
+
+.fx-variant-add:hover {
+  border-color: var(--fx-accent);
+  background: var(--fx-accent-soft);
 }
 
 .fx-danger-zone {
@@ -708,24 +848,137 @@
 
 .fx-edit-layout {
   @apply grid items-start gap-5;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 240px minmax(0, 1fr);
 }
 
 .fx-edit-list {
-  @apply flex flex-col gap-1.5;
+  @apply sticky top-4 flex max-h-[calc(100vh-2rem)] flex-col gap-1.5 overflow-y-auto pr-1;
 }
 
 .fx-edit-list-item {
-  @apply flex cursor-pointer items-center justify-between rounded-[10px] border px-3 py-2.5 text-[0.88rem];
+  @apply flex cursor-pointer items-center gap-2.5 rounded-xl border p-2 text-left text-[0.88rem];
   border-color: var(--fx-border);
   background: var(--fx-surface);
+  color: var(--fx-text);
+}
+
+.fx-edit-list-item:hover {
+  border-color: var(--fx-accent);
 }
 
 .fx-edit-list-item.active {
-  @apply font-semibold;
   border-color: var(--fx-accent);
   background: var(--fx-accent-soft);
+}
+
+.fx-edit-list-thumb {
+  @apply flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg text-[1.3rem];
+  background: var(--fx-surface-soft);
+}
+
+.fx-edit-list-text {
+  @apply flex min-w-0 flex-col;
+}
+
+.fx-edit-list-name {
+  @apply truncate font-semibold;
+}
+
+.fx-edit-list-item.active .fx-edit-list-name {
   color: var(--fx-accent-dark);
+}
+
+.fx-edit-list-meta {
+  @apply truncate text-[0.75rem];
+  color: var(--fx-text-muted);
+}
+
+/* ---------- product detail modal ---------- */
+.fx-modal-card.fx-detail-modal {
+  @apply grid max-w-[880px] gap-6 p-6;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.fx-detail-gallery {
+  @apply flex min-w-0 flex-col gap-2.5;
+}
+
+.fx-gallery-main {
+  @apply relative flex aspect-square items-center justify-center overflow-hidden rounded-xl;
+  background: var(--fx-surface-soft);
+}
+
+.fx-gallery-main img {
+  @apply block h-full w-full object-contain;
+}
+
+.fx-gallery-fallback {
+  @apply text-[4rem];
+}
+
+.fx-gallery-nav {
+  @apply absolute top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 text-2xl leading-none opacity-0 transition-opacity;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--fx-text);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.fx-gallery-main:hover .fx-gallery-nav,
+.fx-gallery-nav:focus-visible {
+  @apply opacity-100;
+}
+
+.fx-gallery-prev {
+  @apply left-2.5;
+}
+
+.fx-gallery-next {
+  @apply right-2.5;
+}
+
+.fx-gallery-count {
+  @apply absolute bottom-2.5 right-2.5 rounded-full px-2.5 py-0.5 text-[0.75rem] font-semibold text-white;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.fx-gallery-thumbs {
+  @apply flex gap-2 overflow-x-auto pb-1;
+}
+
+.fx-gallery-thumb {
+  @apply flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 p-0;
+  border-color: transparent;
+  background: var(--fx-surface-soft);
+}
+
+.fx-gallery-thumb img {
+  @apply block h-full w-full object-cover;
+}
+
+.fx-gallery-thumb .fx-gallery-fallback {
+  @apply text-[1.4rem];
+}
+
+.fx-gallery-thumb.active {
+  border-color: var(--fx-accent);
+}
+
+.fx-detail-info {
+  @apply flex min-w-0 flex-col pt-1;
+}
+
+.fx-detail-name {
+  @apply m-0 pr-8 text-[1.3rem] leading-snug;
+}
+
+.fx-detail-price {
+  @apply mt-1.5 text-[1.35rem] font-bold;
+  color: var(--fx-accent-dark);
+}
+
+.fx-detail-desc {
+  @apply mb-1 mt-3 whitespace-pre-line text-[0.92rem] leading-relaxed;
+  color: var(--fx-text-muted);
 }
 
 @media (max-width: 720px) {
@@ -739,6 +992,22 @@
     @apply hidden;
   }
   .fx-edit-layout {
+    grid-template-columns: 1fr;
+  }
+  .fx-edit-list {
+    @apply static max-h-none flex-row overflow-x-auto pb-1;
+  }
+  .fx-edit-list-item {
+    @apply shrink-0;
+  }
+  .fx-edit-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .fx-variant-fields .fx-mini-field:nth-child(-n + 3),
+  .fx-variant-fields .fx-mini-field:nth-child(n + 4) {
+    grid-column: span 6;
+  }
+  .fx-modal-card.fx-detail-modal {
     grid-template-columns: 1fr;
   }
 }
