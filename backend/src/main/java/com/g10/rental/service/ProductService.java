@@ -36,7 +36,7 @@ public class ProductService {
     private final CartItemRepository cartItemRepository;
     private final FavoriteRepository favoriteRepository;
 
-    private static final Set<BookingStatus> ACTIVE_BOOKING_STATUSES =
+    static final Set<BookingStatus> ACTIVE_BOOKING_STATUSES =
             EnumSet.of(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.SHIPPED);
 
     public List<ProductResponse> getAllProducts() {
@@ -53,7 +53,7 @@ public class ProductService {
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
-        product.setImageUrl(request.getImageUrl());
+        applyImages(product, request.getImageUrls(), request.getImageUrl());
         product.setCategory(request.getCategory());
         product.setStock(request.getStock());
 
@@ -76,19 +76,40 @@ public class ProductService {
             }
         }
 
+        syncStock(savedProduct);
         return toResponse(savedProduct);
     }
 
+    @Transactional
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
         Product product = getProductEntityById(id);
         product.setName(request.name());
         product.setDescription(request.description());
         product.setPrice(request.price());
-        product.setImageUrl(request.imageUrl());
+        applyImages(product, request.imageUrls(), request.imageUrl());
         product.setCategory(request.category());
         product.setStock(request.stock());
+        syncStock(product);
 
         return toResponse(productRepository.save(product));
+    }
+
+    // First image is the cover; with no images the fallback icon (emoji or single URL) is kept as-is.
+    private static void applyImages(Product product, List<String> imageUrls, String fallbackIcon) {
+        List<String> images = imageUrls == null ? List.of() : imageUrls.stream().map(String::trim).filter(u -> !u.isEmpty()).toList();
+        product.getImageUrls().clear();
+        product.getImageUrls().addAll(images);
+        product.setImageUrl(images.isEmpty() ? fallbackIcon : images.get(0));
+    }
+
+    // When a product has sizes/colors, its total stock is always the sum of theirs.
+    @Transactional
+    public void syncStock(Product product) {
+        List<ProductVariant> variants = productVariantRepository.findByProductId(product.getId());
+        if (!variants.isEmpty()) {
+            product.setStock(variants.stream().mapToInt(v -> v.getStockQty() == null ? 0 : v.getStockQty()).sum());
+            productRepository.save(product);
+        }
     }
 
     @Transactional
@@ -132,13 +153,14 @@ public class ProductService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getImageUrl(),
+                List.copyOf(product.getImageUrls()),
                 product.getCategory(),
                 product.getStock(),
                 product.getCreatedAt(),
                 product.getUpdatedAt());
     }
 
-    private String generateSku() {
+    static String generateSku() {
         return "SKU-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

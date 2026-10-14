@@ -134,11 +134,152 @@
   color: var(--fx-text-muted);
 }
 
-.fx-field input {
+.fx-field input,
+.fx-field select,
+.fx-field textarea {
   @apply w-full rounded-lg border px-3 py-2.5 text-[0.95rem];
   border-color: var(--fx-border);
   background: var(--fx-bg);
   color: var(--fx-text);
+  font-family: inherit;
+}
+
+.fx-field textarea {
+  @apply resize-y;
+}
+
+.fx-field input[type='file'] {
+  @apply cursor-pointer;
+}
+
+.fx-image-grid {
+  @apply mb-3 grid gap-2.5;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+
+.fx-image-tile {
+  @apply relative aspect-square overflow-hidden rounded-lg border;
+  border-color: var(--fx-border);
+  background: var(--fx-surface-soft);
+}
+
+.fx-image-tile img {
+  @apply h-full w-full object-cover;
+}
+
+.fx-image-tile.fx-image-cover {
+  @apply border-2;
+  border-color: var(--fx-accent);
+}
+
+.fx-image-loading {
+  @apply flex items-center justify-center text-[0.75rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-image-badge {
+  @apply absolute left-1 top-1 rounded-md px-1.5 py-0.5 text-[0.68rem] font-semibold text-white;
+  background: var(--fx-accent);
+}
+
+.fx-image-actions {
+  @apply absolute inset-x-0 bottom-0 flex justify-center gap-1 p-1;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.fx-image-actions button {
+  @apply h-6 w-6 cursor-pointer rounded border-0 text-[0.8rem] leading-none text-white;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.fx-image-actions button:disabled {
+  @apply cursor-default opacity-30;
+}
+
+.fx-image-actions button.fx-image-remove {
+  background: var(--fx-danger);
+}
+
+.fx-gallery {
+  @apply relative;
+}
+
+.fx-gallery-nav {
+  @apply absolute top-1/2 h-9 w-9 -translate-y-1/2 cursor-pointer rounded-full border-0 text-xl leading-none;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--fx-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.fx-gallery-prev {
+  @apply left-2;
+}
+
+.fx-gallery-next {
+  @apply right-2;
+}
+
+.fx-gallery-count {
+  @apply absolute bottom-2 right-2 rounded-full px-2 py-0.5 text-[0.72rem] text-white;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.fx-gallery-thumbs {
+  @apply mt-2 flex gap-1.5 overflow-x-auto pb-1;
+}
+
+.fx-gallery-thumb {
+  @apply h-14 w-14 shrink-0 cursor-pointer overflow-hidden rounded-md border-2 p-0 opacity-60;
+  border-color: transparent;
+  background: var(--fx-surface-soft);
+}
+
+.fx-gallery-thumb img {
+  @apply h-full w-full object-cover;
+}
+
+.fx-gallery-thumb.active {
+  @apply opacity-100;
+  border-color: var(--fx-accent);
+}
+
+.fx-edit-section-title {
+  @apply mb-3 mt-0 text-[1.05rem];
+}
+
+.fx-variant-table-wrap {
+  @apply overflow-x-auto;
+}
+
+.fx-variant-table th {
+  @apply whitespace-nowrap text-[0.78rem];
+}
+
+.fx-variant-table td {
+  @apply p-1;
+}
+
+.fx-variant-table input {
+  @apply w-full min-w-[64px] rounded-md border px-2 py-1.5 text-[0.85rem];
+  border-color: var(--fx-border);
+  background: var(--fx-bg);
+  color: var(--fx-text);
+}
+
+.fx-variant-table .fx-variant-actions {
+  @apply flex gap-1 whitespace-nowrap;
+}
+
+.fx-variant-table .fx-variant-actions .fx-btn {
+  @apply px-2.5 py-1.5 text-[0.8rem];
+}
+
+.fx-variant-new td {
+  background: var(--fx-surface-soft);
+}
+
+.fx-danger-zone {
+  @apply flex items-center justify-between gap-4;
 }
 
 .fx-field input:focus {

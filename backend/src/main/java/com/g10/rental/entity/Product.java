@@ -3,6 +3,8 @@ package com.g10.rental.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -30,6 +32,12 @@ public class Product {
     private BigDecimal price;
 
     private String imageUrl;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @OrderColumn(name = "sort_order")
+    @Column(name = "url", nullable = false)
+    private List<String> imageUrls = new ArrayList<>();
 
     private String category;
 

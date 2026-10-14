@@ -29,6 +29,9 @@ public class CreateProductRequest {
     @Size(max = 255, message = "ลิงก์รูปภาพยาวเกิน 255 ตัวอักษร")
     private String imageUrl;
 
+    @Size(max = 8, message = "ใส่รูปได้ไม่เกิน 8 รูป")
+    private List<@NotBlank @Size(max = 255, message = "ลิงก์รูปภาพยาวเกิน 255 ตัวอักษร") String> imageUrls;
+
     @NotBlank(message = "กรุณาเลือกหมวดหมู่")
     @Size(max = 255, message = "ชื่อหมวดหมู่ยาวเกิน 255 ตัวอักษร")
     private String category;

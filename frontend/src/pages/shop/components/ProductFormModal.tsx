@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { addCategory, addProduct, useCategories } from './store'
 import { FxAlert } from './FxAlert'
-import { uploadProductImage } from '../../../lib/api'
+import { ImageListEditor } from './ImageListEditor'
 
 type ProductFormModalProps = {
   onClose: () => void
@@ -14,8 +14,8 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [pricePerDay, setPricePerDay] = useState(0)
-  const [imageUrl, setImageUrl] = useState('')
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [icon, setIcon] = useState('')
+  const [images, setImages] = useState<string[]>([])
   const [category, setCategory] = useState(categories[0] ?? '')
   const [newCategory, setNewCategory] = useState('')
   const [stock, setStock] = useState(1)
@@ -33,31 +33,6 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
     setNewCategory('')
   }
 
-  async function handleImageFile(file: File | undefined) {
-    if (!file) return
-    if (file.size > 5 * 1024 * 1024) {
-      setError('รูปภาพต้องมีขนาดไม่เกิน 5 MB')
-      return
-    }
-    setError(null)
-    setImagePreview(URL.createObjectURL(file))
-    setImageUrl('')
-    setUploading(true)
-    try {
-      setImageUrl(await uploadProductImage(file))
-    } catch (err) {
-      setImagePreview(null)
-      setError(err instanceof Error ? err.message : 'อัปโหลดรูปไม่สำเร็จ')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  function clearImage() {
-    setImagePreview(null)
-    setImageUrl('')
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim() || pricePerDay <= 0 || submitting || uploading) return
@@ -69,7 +44,8 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
         name: name.trim(),
         description: description.trim(),
         category,
-        imageUrl: imageUrl.trim(),
+        imageUrl: icon.trim(),
+        imageUrls: images,
         pricePerDay,
         stock,
         sizes: sizes.split(',').map((s) => s.trim()).filter(Boolean),
@@ -122,46 +98,16 @@ export function ProductFormModal({ onClose, onCreated }: ProductFormModalProps) 
           </div>
 
           <div className="fx-field">
-            <label htmlFor="fx-pf-image-file">รูปสินค้า (อัปโหลดจากเครื่อง)</label>
-            <input
-              id="fx-pf-image-file"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => handleImageFile(e.target.files?.[0])}
-            />
-            <span className="fx-page-subtitle" style={{ fontSize: '0.78rem' }}>
-              JPG, PNG หรือ WebP ขนาดไม่เกิน 5 MB
-            </span>
-            {imagePreview && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
-                <img
-                  src={imagePreview}
-                  alt="ตัวอย่างรูปสินค้า"
-                  style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, opacity: uploading ? 0.5 : 1 }}
-                />
-                <div>
-                  <p className="fx-page-subtitle" style={{ margin: '0 0 6px' }}>
-                    {uploading ? 'กำลังอัปโหลด...' : 'อัปโหลดแล้ว ✓'}
-                  </p>
-                  <button type="button" className="fx-btn fx-btn-ghost" onClick={clearImage} disabled={uploading}>
-                    เอารูปออก
-                  </button>
-                </div>
-              </div>
-            )}
+            <label>รูปสินค้า</label>
+            <ImageListEditor images={images} onChange={setImages} onUploadingChange={setUploading} onError={setError} />
           </div>
 
-          <div className="fx-field">
-            <label htmlFor="fx-pf-icon">หรือใส่ emoji / URL รูปภาพแทน</label>
-            <input
-              id="fx-pf-icon"
-              type="text"
-              value={imagePreview ? '' : imageUrl}
-              placeholder={imagePreview ? 'ใช้รูปที่อัปโหลดไว้ด้านบนแล้ว' : '👕 หรือ https://...'}
-              disabled={!!imagePreview}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-          </div>
+          {images.length === 0 && (
+            <div className="fx-field">
+              <label htmlFor="fx-pf-icon">ไอคอนแทนรูป (ใช้เมื่อไม่มีรูป)</label>
+              <input id="fx-pf-icon" type="text" value={icon} placeholder="เช่น 👗" onChange={(e) => setIcon(e.target.value)} />
+            </div>
+          )}
 
           <div className="fx-field">
             <label htmlFor="fx-pf-stock">จำนวนคงเหลือ</label>

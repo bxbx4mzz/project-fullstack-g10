@@ -8,6 +8,7 @@ public record ProductResponse(
         String description,
         BigDecimal price,
         String imageUrl,
+        java.util.List<String> imageUrls,
         String category,
         Integer stock,
         java.time.LocalDateTime createdAt,

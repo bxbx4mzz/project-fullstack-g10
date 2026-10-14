@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleUnreadable(HttpMessageNotReadableException ex) {
         return Map.of("status", 400, "error", "Bad Request", "message", "ข้อมูลที่ส่งมาไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, Object> handleAccessDenied(AccessDeniedException ex) {
+        return Map.of("status", 403, "error", "Forbidden", "message", "คุณไม่มีสิทธิ์ทำรายการนี้");
     }
 
     @ExceptionHandler(ResponseStatusException.class)

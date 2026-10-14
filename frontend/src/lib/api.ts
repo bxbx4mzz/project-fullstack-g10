@@ -63,6 +63,7 @@ export interface ApiProduct {
   description: string | null
   price: number
   imageUrl: string | null
+  imageUrls: string[]
   category: string
   stock: number
   createdAt: string
@@ -97,6 +98,7 @@ export interface CreateProductInput {
   description: string
   price: number
   imageUrl: string
+  imageUrls: string[]
   category: string
   stock: number
   variants: CreateProductVariantInput[]
@@ -130,6 +132,22 @@ export function createProduct(input: CreateProductInput): Promise<ApiProduct> {
 
 export function updateProduct(id: number, input: Omit<CreateProductInput, 'variants'>): Promise<ApiProduct> {
   return apiFetch(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(input) })
+}
+
+export function fetchProduct(id: number): Promise<ApiProduct> {
+  return apiFetch(`/api/products/${id}`)
+}
+
+export function createVariant(productId: number, input: CreateProductVariantInput): Promise<ApiProductVariant> {
+  return apiFetch(`/api/products/${productId}/variants`, { method: 'POST', body: JSON.stringify(input) })
+}
+
+export function updateVariant(productId: number, variantId: number, input: CreateProductVariantInput): Promise<ApiProductVariant> {
+  return apiFetch(`/api/products/${productId}/variants/${variantId}`, { method: 'PUT', body: JSON.stringify(input) })
+}
+
+export function deleteVariant(productId: number, variantId: number): Promise<void> {
+  return apiFetch(`/api/products/${productId}/variants/${variantId}`, { method: 'DELETE' })
 }
 
 export function deleteProduct(id: number): Promise<void> {

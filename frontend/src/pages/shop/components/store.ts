@@ -4,6 +4,7 @@ import {
   addFavorite as apiAddFavorite,
   createProduct as apiCreateProduct,
   fetchMyFavorites,
+  fetchProduct,
   fetchProductVariants,
   fetchProducts as apiFetchProducts,
   removeFavorite as apiRemoveFavorite,
@@ -20,6 +21,7 @@ export type Product = {
   price: string
   stock: number
   icon: string
+  images: string[]
   sizes: string[]
   colors: string[]
   variants: ApiProductVariant[]
@@ -30,6 +32,7 @@ export type NewProductInput = {
   description: string
   category: string
   imageUrl: string
+  imageUrls: string[]
   pricePerDay: number
   stock: number
   sizes: string[]
@@ -49,6 +52,7 @@ type ShopState = {
   loadFavorites: () => Promise<void>
   addProduct: (input: NewProductInput) => Promise<Product>
   removeProduct: (id: number) => void
+  refreshProduct: (id: number) => Promise<Product>
   addCategory: (category: string) => void
   toggleFavorite: (productId: number) => Promise<void>
   resetFavorites: () => void
@@ -61,6 +65,10 @@ let favoritesGeneration = 0
 
 const DEFAULT_CATEGORIES = ['dress', 'shirt', 'skirt', 'pants']
 
+export function isImageUrl(value: string): boolean {
+  return /^(https?:\/\/|data:image|\/uploads\/)/.test(value)
+}
+
 function uniqueNonEmpty(values: (string | null)[]): string[] {
   return [...new Set(values.filter((v): v is string => !!v && v.trim() !== ''))]
 }
@@ -69,6 +77,8 @@ function toStoreProduct(apiProduct: ApiProduct, variants: ApiProductVariant[]): 
   const sizes = uniqueNonEmpty(variants.map((v) => v.size))
   const colors = uniqueNonEmpty(variants.map((v) => v.color))
   const stock = variants.length > 0 ? variants.reduce((sum, v) => sum + v.stockQty, 0) : apiProduct.stock
+  const icon = apiProduct.imageUrl && apiProduct.imageUrl.trim() !== '' ? apiProduct.imageUrl : '👕'
+  const images = apiProduct.imageUrls?.length ? apiProduct.imageUrls : isImageUrl(icon) ? [icon] : []
 
   return {
     id: apiProduct.id,
@@ -77,7 +87,8 @@ function toStoreProduct(apiProduct: ApiProduct, variants: ApiProductVariant[]): 
     category: apiProduct.category ?? '',
     price: `฿${apiProduct.price}/วัน`,
     stock,
-    icon: apiProduct.imageUrl && apiProduct.imageUrl.trim() !== '' ? apiProduct.imageUrl : '👕',
+    icon,
+    images,
     sizes: sizes.length > 0 ? sizes : ['Free Size'],
     colors: colors.length > 0 ? colors : ['-'],
     variants,
@@ -154,6 +165,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
       description: input.description,
       price: input.pricePerDay,
       imageUrl: input.imageUrl,
+      imageUrls: input.imageUrls,
       category: input.category,
       stock: input.stock,
       variants,
@@ -165,6 +177,13 @@ export const useShopStore = create<ShopState>((set, get) => ({
   },
 
   removeProduct: (id) => set((s) => ({ products: s.products.filter((p) => p.id !== id) })),
+
+  refreshProduct: async (id) => {
+    const [apiProduct, variants] = await Promise.all([fetchProduct(id), fetchVariantsSafe(id)])
+    const product = toStoreProduct(apiProduct, variants)
+    set((s) => ({ products: s.products.map((p) => (p.id === id ? product : p)) }))
+    return product
+  },
 
   addCategory: (category) => {
     const trimmed = category.trim()
@@ -230,6 +249,7 @@ export function useEnsureFavoritesLoaded() {
 
 export const addProduct = (input: NewProductInput) => useShopStore.getState().addProduct(input)
 export const removeProductLocally = (id: number) => useShopStore.getState().removeProduct(id)
+export const refreshProduct = (id: number) => useShopStore.getState().refreshProduct(id)
 export const addCategory = (category: string) => useShopStore.getState().addCategory(category)
 export const toggleFavorite = (productId: number) => useShopStore.getState().toggleFavorite(productId)
 export const resetFavorites = () => useShopStore.getState().resetFavorites()

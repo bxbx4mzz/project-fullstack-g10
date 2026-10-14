@@ -1,6 +1,8 @@
 package com.g10.rental.controller;
 
+import com.g10.rental.dto.product.CreateProductVariantRequest;
 import com.g10.rental.entity.ProductVariant;
+import jakarta.validation.Valid;
 import com.g10.rental.service.ProductVariantService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,5 +29,25 @@ public class ProductVariantController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
     public ProductVariant getVariant(@PathVariable Long productId, @PathVariable Long variantId) {
         return productVariantService.getVariant(productId, variantId);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    public ProductVariant createVariant(@PathVariable Long productId,
+                                        @Valid @RequestBody CreateProductVariantRequest request) {
+        return productVariantService.createVariant(productId, request);
+    }
+
+    @PutMapping("/{variantId}")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    public ProductVariant updateVariant(@PathVariable Long productId, @PathVariable Long variantId,
+                                        @Valid @RequestBody CreateProductVariantRequest request) {
+        return productVariantService.updateVariant(productId, variantId, request);
+    }
+
+    @DeleteMapping("/{variantId}")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    public void deleteVariant(@PathVariable Long productId, @PathVariable Long variantId) {
+        productVariantService.deleteVariant(productId, variantId);
     }
 }
