@@ -31,7 +31,7 @@ public class CalendarController {
     }
 
     @GetMapping("/api/variants/{variantId}/calendar")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
+    @PreAuthorize("permitAll()")
     public VariantCalendarResponse variantCalendar(
             @PathVariable Long variantId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,

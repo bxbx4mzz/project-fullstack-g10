@@ -20,13 +20,13 @@ public class ProductVariantController {
     private final ProductVariantService productVariantService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
+    @PreAuthorize("permitAll()")
     public List<ProductVariant> getVariants(@PathVariable Long productId, @RequestParam(required = false) String search) {
         return productVariantService.getVariants(productId, search);
     }
 
     @GetMapping("/{variantId}")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
+    @PreAuthorize("permitAll()")
     public ProductVariant getVariant(@PathVariable Long productId, @PathVariable Long variantId) {
         return productVariantService.getVariant(productId, variantId);
     }

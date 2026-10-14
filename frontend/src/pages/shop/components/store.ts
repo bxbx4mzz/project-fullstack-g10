@@ -232,6 +232,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
 export const useProducts = () => useShopStore((s) => s.products)
 export const useProductsError = () => useShopStore((s) => s.productsError)
+export const useProductsLoading = () => useShopStore((s) => s.productsStatus !== 'done')
 export const useCategories = () => useShopStore((s) => s.categories)
 export const useFavorites = () => useShopStore((s) => s.favorites)
 
@@ -241,10 +242,10 @@ export function useEnsureProductsLoaded() {
   }, [])
 }
 
-export function useEnsureFavoritesLoaded() {
+export function useEnsureFavoritesLoaded(enabled = true) {
   useEffect(() => {
-    void useShopStore.getState().loadFavorites()
-  }, [])
+    if (enabled) void useShopStore.getState().loadFavorites()
+  }, [enabled])
 }
 
 export const addProduct = (input: NewProductInput) => useShopStore.getState().addProduct(input)

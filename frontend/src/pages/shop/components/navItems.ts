@@ -2,11 +2,11 @@ import type { FxNavItem } from './FxLayout'
 
 export const userNavItems: FxNavItem[] = [
   { key: 'home', label: 'Home', icon: '🏠', to: '/shop' },
-  { key: 'calendar', label: 'Calendar', icon: '📅', to: '/shop/calendar' },
-  { key: 'cart', label: 'Cart', icon: '🛒', to: '/shop/cart' },
-  { key: 'favorites', label: 'Favorites', icon: '⭐', to: '/shop/favorites' },
-  { key: 'status', label: 'Rental Status', icon: '🚚', to: '/shop/status' },
-  { key: 'chat', label: 'ChatAI', icon: '💬', to: '/shop/chat' },
+  { key: 'calendar', label: 'Calendar', icon: '📅', to: '/shop/calendar', requiresLogin: true },
+  { key: 'cart', label: 'Cart', icon: '🛒', to: '/shop/cart', requiresLogin: true },
+  { key: 'favorites', label: 'Favorites', icon: '⭐', to: '/shop/favorites', requiresLogin: true },
+  { key: 'status', label: 'Rental Status', icon: '🚚', to: '/shop/status', requiresLogin: true },
+  { key: 'chat', label: 'ChatAI', icon: '💬', to: '/shop/chat', requiresLogin: true },
 ]
 
 export const adminNavItems: FxNavItem[] = [

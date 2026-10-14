@@ -7,7 +7,6 @@ Thumbs.db
 .vscode/
 *.iml
 
-
 # --- Backend (Maven / Java) ---
 backend/target/
 backend/uploads/

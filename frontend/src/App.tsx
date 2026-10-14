@@ -29,7 +29,7 @@ import { StaffBookingPage } from './pages/shop/StaffBookingPage'
 function RoleHomeRedirect() {
   const { user, loading } = useAuth()
   if (loading) return <div className="page-center">Loading...</div>
-  return <Navigate to={user ? homePathForRole(user.role) : '/login'} replace />
+  return <Navigate to={user ? homePathForRole(user.role) : '/shop'} replace />
 }
 
 export default function App() {
@@ -43,11 +43,7 @@ export default function App() {
 
           <Route
             path="/shop"
-            element={
-              <ProtectedRoute>
-                <ShopHomePage />
-              </ProtectedRoute>
-            }
+            element={<ShopHomePage />}
           />
           <Route
             path="/shop/calendar"

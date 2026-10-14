@@ -336,6 +336,54 @@
   @apply cursor-not-allowed opacity-50;
 }
 
+.fx-topbar {
+  @apply -mt-2 mb-4 flex justify-end;
+}
+
+.fx-btn.fx-login-btn {
+  @apply gap-2 border bg-white;
+  border-color: var(--fx-border);
+  color: var(--fx-text);
+  box-shadow: 0 1px 3px rgba(63, 58, 52, 0.08);
+}
+
+.fx-btn.fx-login-btn:hover {
+  background: var(--fx-surface-soft);
+  border-color: var(--fx-accent);
+}
+
+.fx-guest-card {
+  @apply border border-dashed;
+  border-color: var(--fx-accent);
+}
+
+.fx-guest-note {
+  @apply text-[0.75rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-nav-item.fx-nav-locked {
+  @apply w-full cursor-pointer border-0 bg-transparent text-left;
+  color: var(--fx-text-muted);
+}
+
+.fx-modal-card.fx-login-prompt {
+  @apply max-w-[380px] text-center;
+}
+
+.fx-login-prompt h2 {
+  @apply m-0 mb-1.5 text-[1.15rem];
+}
+
+.fx-login-prompt p {
+  @apply m-0 text-[0.9rem] leading-relaxed;
+  color: var(--fx-text-muted);
+}
+
+.fx-login-prompt-actions {
+  @apply mt-5 flex justify-center gap-2;
+}
+
 .fx-btn.fx-role-current,
 .fx-btn.fx-role-current:disabled {
   @apply cursor-default opacity-100;
