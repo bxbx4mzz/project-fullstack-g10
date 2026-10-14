@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import { homePathForRole } from './lib/api'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import { OAuthRedirectPage } from './pages/OAuthRedirectPage'
@@ -24,6 +25,12 @@ import { StaffOverviewPage } from './pages/shop/StaffOverviewPage'
 import { StaffEditPage } from './pages/shop/StaffEditPage'
 import { StaffOrdersPage } from './pages/shop/StaffOrdersPage'
 import { StaffBookingPage } from './pages/shop/StaffBookingPage'
+
+function RoleHomeRedirect() {
+  const { user, loading } = useAuth()
+  if (loading) return <div className="page-center">Loading...</div>
+  return <Navigate to={user ? homePathForRole(user.role) : '/login'} replace />
+}
 
 export default function App() {
   return (
@@ -197,8 +204,8 @@ export default function App() {
             }
           />
 
-          <Route path="/" element={<Navigate to="/shop" replace />} />
-          <Route path="*" element={<Navigate to="/shop" replace />} />
+          <Route path="/" element={<RoleHomeRedirect />} />
+          <Route path="*" element={<RoleHomeRedirect />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

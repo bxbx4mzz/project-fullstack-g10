@@ -18,7 +18,7 @@ public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHan
     private final String frontendUrl;
 
     public OAuth2LoginFailureHandler(@Value("${app.frontend-url}") String frontendUrl) {
-        this.frontendUrl = frontendUrl;
+        this.frontendUrl = frontendUrl.replaceAll("/+$", "");
     }
 
     @Override

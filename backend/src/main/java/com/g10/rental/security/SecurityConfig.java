@@ -38,7 +38,7 @@ public class SecurityConfig {
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
         this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
         this.clientRegistrationRepository = clientRegistrationRepository;
-        this.frontendUrl = frontendUrl;
+        this.frontendUrl = frontendUrl.replaceAll("/+$", "");
     }
 
     @Bean
