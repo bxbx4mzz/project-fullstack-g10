@@ -90,22 +90,25 @@ export function AdminUsersPage() {
                   </td>
                   <td>{u.email}</td>
                   <td>
-                    <span className="fx-user-badge">{ROLE_LABEL[u.role]}</span>
+                    <span className={`fx-role-badge fx-role-${u.role.toLowerCase()}`}>{ROLE_LABEL[u.role]}</span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {ROLES.map((role) => (
-                        <button
-                          key={role}
-                          type="button"
-                          className={`fx-btn ${role === u.role ? '' : 'fx-btn-ghost'}`}
-                          style={{ padding: '6px 12px', fontSize: '0.8rem' }}
-                          disabled={role === u.role || savingId === u.id}
-                          onClick={() => handleRoleChange(u.id, role)}
-                        >
-                          {savingId === u.id ? '...' : ROLE_LABEL[role]}
-                        </button>
-                      ))}
+                      {ROLES.map((role) => {
+                        const isCurrent = role === u.role
+                        return (
+                          <button
+                            key={role}
+                            type="button"
+                            className={`fx-btn fx-btn-sm ${isCurrent ? 'fx-role-current' : 'fx-btn-ghost'}`}
+                            disabled={isCurrent || savingId === u.id}
+                            aria-pressed={isCurrent}
+                            onClick={() => handleRoleChange(u.id, role)}
+                          >
+                            {savingId === u.id && !isCurrent ? '...' : `${isCurrent ? '✓ ' : ''}${ROLE_LABEL[role]}`}
+                          </button>
+                        )
+                      })}
                     </div>
                   </td>
                   <td>

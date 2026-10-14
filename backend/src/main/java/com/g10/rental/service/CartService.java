@@ -36,7 +36,6 @@ public class CartService {
     private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
     public CartResponse getMyCart(Authentication authentication) {
         User user = getCurrentUser(authentication);
         Cart cart = cartRepository.findByUserId(user.getId()).orElseGet(() -> createCart(user));

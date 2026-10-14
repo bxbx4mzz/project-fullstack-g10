@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { fetchCurrentUser, logout as logoutRequest, type CurrentUser } from '../lib/api'
+import { AUTH_CHECK_EVENT, fetchCurrentUser, logout as logoutRequest, type CurrentUser } from '../lib/api'
 import { resetFavorites } from '../pages/shop/components/store'
 
 interface AuthContextValue {
@@ -43,6 +43,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  useEffect(() => {
+    let checking = false
+    async function recheck() {
+      if (checking) return
+      checking = true
+      try {
+        applyUser(await fetchCurrentUser())
+      } catch {
+        // network blip: keep the current user rather than logging them out
+      } finally {
+        checking = false
+      }
+    }
+    window.addEventListener(AUTH_CHECK_EVENT, recheck)
+    return () => window.removeEventListener(AUTH_CHECK_EVENT, recheck)
+  }, [applyUser])
 
   const logout = useCallback(async () => {
     await logoutRequest()

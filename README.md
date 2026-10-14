@@ -156,18 +156,3 @@ nginx ใน container frontend ส่งต่อ `/api`, `/oauth2`, `/login`, 
 เปลี่ยน port ได้ด้วย `FRONTEND_PORT` ใน `backend/.env` (อย่าใช้ 6000 เพราะ Chrome บล็อก)
 ถ้าแก้โค้ด frontend ต้องรัน `docker compose up -d --build frontend` ใหม่ถึงจะเห็นผล
 
----
-
-## แก้ปัญหาที่เจอบ่อย
-
-| อาการ | สาเหตุ / วิธีแก้ |
-|---|---|
-| Google ขึ้น `redirect_uri_mismatch` | ยังไม่ได้ใส่ redirect URI ในข้อ 3 (หรือใส่แล้วแต่ยังไม่มีผล รอสักครู่) |
-| Google ขึ้น `access_denied` / เข้าไม่ได้ | consent screen อยู่ในโหมด Testing แต่อีเมลนี้ไม่อยู่ใน Test users |
-| login แล้วเด้งไปหน้าที่เปิดไม่ได้ | `FRONTEND_URL` ใน `backend/.env` ไม่ตรงกับที่เปิดเว็บอยู่ (5173 หรือ 3000) |
-| `docker compose up` error เรื่อง port | มีโปรแกรมอื่นใช้ port 5432 / 8080 / 3000 อยู่ ให้ปิดก่อน |
-| Chat AI ตอบว่า "ยังไม่ได้ตั้งค่า GEMINI_API_KEY" | ยังไม่ได้ใส่ key ใน `backend/.env` หรือใส่แล้วยังไม่ได้ `docker compose up -d backend` |
-| Chat AI ตอบว่า "ไม่สามารถติดต่อผู้ช่วย AI ได้ในขณะนี้" | model ไม่ว่างชั่วคราว ลองใหม่ หรือเปลี่ยน `GEMINI_MODEL` ใน `backend/.env` แล้ว `docker compose up -d backend` |
-| หน้าร้านไม่มีสินค้า | ยังไม่ได้ทำข้อ 8 |
-| แก้ `.env` แล้วไม่มีผล | ต้อง save ไฟล์ก่อน แล้วรัน `docker compose up -d backend` (คำสั่ง `restart` ไม่อ่านค่าใหม่) |
-| backend ล่มหลังสลับ branch | อาจมีไฟล์ `.java` เก่าถูก save กลับมา ดู error ได้ด้วย `docker compose logs backend` |

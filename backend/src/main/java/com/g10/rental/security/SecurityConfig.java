@@ -9,13 +9,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Configuration
@@ -70,9 +73,21 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("RENTAL_SESSION")
                 )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, e) ->
+                                writeJsonError(response, HttpStatus.UNAUTHORIZED, "กรุณาเข้าสู่ระบบใหม่"))
+                        .accessDeniedHandler((request, response, e) ->
+                                writeJsonError(response, HttpStatus.FORBIDDEN, "คุณไม่มีสิทธิ์ทำรายการนี้")));
 
         return http.build();
+    }
+
+    private static void writeJsonError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write("{\"status\":" + status.value() + ",\"error\":\"" + status.getReasonPhrase()
+                + "\",\"message\":\"" + message + "\"}");
     }
 
     @Bean

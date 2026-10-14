@@ -10,7 +10,9 @@ export interface CurrentUser {
   role: Role
 }
 
-export const googleLoginUrl = `${API_BASE_URL}/oauth2/authorization/google`
+export const AUTH_CHECK_EVENT = 'rental:auth-check'
+
+export const googleLoginUrl =`${API_BASE_URL}/oauth2/authorization/google`
 
 export function homePathForRole(role: Role): string {
   if (role === 'ADMIN') return '/admin-panel'
@@ -111,6 +113,8 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
     ...options,
   })
   if (!res.ok) {
+    // The session may have expired or been replaced by another account logged in from another tab.
+    if (res.status === 401 || res.status === 403) window.dispatchEvent(new Event(AUTH_CHECK_EVENT))
     const body = await res.json().catch(() => null)
     throw new Error(body?.message ?? `Request failed (${res.status})`)
   }

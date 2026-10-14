@@ -336,6 +336,33 @@
   @apply cursor-not-allowed opacity-50;
 }
 
+.fx-btn.fx-role-current,
+.fx-btn.fx-role-current:disabled {
+  @apply cursor-default opacity-100;
+  background: var(--fx-accent-dark);
+  border-color: var(--fx-accent-dark);
+  color: #fff;
+}
+
+.fx-role-badge {
+  @apply inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-[0.78rem] font-semibold;
+}
+
+.fx-role-customer {
+  background: #eef1f4;
+  color: #4a5563;
+}
+
+.fx-role-staff {
+  background: #e3eefb;
+  color: #2b5c9a;
+}
+
+.fx-role-admin {
+  background: var(--fx-accent-dark);
+  color: #fff;
+}
+
 .fx-variant-list {
   @apply flex flex-col gap-3;
 }
@@ -584,6 +611,113 @@
   background: var(--fx-accent-soft);
   border-color: var(--fx-accent);
   color: var(--fx-accent-dark);
+}
+
+.fx-cal-day.fx-cal-partial {
+  background: #fdf6e8;
+  border-color: #ecd3a5;
+  color: var(--fx-accent-dark);
+}
+
+.fx-cal-day.fx-cal-selected {
+  box-shadow: 0 0 0 2px var(--fx-text);
+}
+
+.fx-tabs {
+  @apply mb-4 inline-flex gap-1 rounded-xl border p-1;
+  border-color: var(--fx-border);
+  background: var(--fx-surface);
+}
+
+.fx-tabs button {
+  @apply inline-flex cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-4 py-2 text-[0.9rem] font-semibold;
+  color: var(--fx-text-muted);
+}
+
+.fx-tabs button.active {
+  background: var(--fx-accent);
+  color: #fff;
+}
+
+.fx-tab-count {
+  @apply rounded-full px-2 text-[0.72rem];
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.fx-tabs button:not(.active) .fx-tab-count {
+  background: var(--fx-accent-soft);
+  color: var(--fx-accent-dark);
+}
+
+.fx-cal-legend {
+  @apply mt-3.5 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.8rem];
+  color: var(--fx-text-muted);
+}
+
+.fx-cal-legend span {
+  @apply inline-flex items-center gap-1.5;
+}
+
+.fx-cal-swatch {
+  @apply inline-block h-3.5 w-3.5 rounded border;
+}
+
+.fx-cal-swatch.fx-cal-booked {
+  background: var(--fx-accent-soft);
+  border-color: var(--fx-accent);
+}
+
+.fx-cal-swatch.fx-cal-partial {
+  background: #fdf6e8;
+  border-color: #ecd3a5;
+}
+
+.fx-cal-day-detail {
+  @apply mt-4 border-t pt-4;
+  border-color: var(--fx-border);
+}
+
+.fx-cal-booking {
+  @apply mt-2.5 rounded-xl border p-3;
+  border-color: var(--fx-border);
+  background: var(--fx-surface-soft);
+}
+
+.fx-cal-booking-head {
+  @apply flex items-center justify-between gap-2 font-semibold;
+}
+
+.fx-cal-booking ul {
+  @apply my-2 pl-5 text-[0.88rem];
+}
+
+.fx-status-pill {
+  @apply whitespace-nowrap rounded-full px-2.5 py-0.5 text-[0.75rem] font-semibold;
+}
+
+.fx-status-pending {
+  background: #fdf1d8;
+  color: #9a6a12;
+}
+
+.fx-status-confirmed {
+  background: #e3eefb;
+  color: #2b5c9a;
+}
+
+.fx-status-shipped {
+  background: #fdebd9;
+  color: #b4581a;
+}
+
+.fx-status-returned {
+  background: #e4f3e6;
+  color: #2f6b34;
+}
+
+.fx-status-cancelled {
+  background: #f1f1f1;
+  color: #777;
 }
 
 .fx-cal-day.fx-cal-today {

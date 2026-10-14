@@ -4,10 +4,12 @@ type FxCalendarGridProps = {
   year: number
   month: number
   bookedDays?: number[]
+  partialDays?: number[]
+  selectedDay?: number | null
   onSelectDay?: (day: number) => void
 }
 
-export function FxCalendarGrid({ year, month, bookedDays = [], onSelectDay }: FxCalendarGridProps) {
+export function FxCalendarGrid({ year, month, bookedDays = [], partialDays = [], selectedDay, onSelectDay }: FxCalendarGridProps) {
   const firstDow = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const today = new Date()
@@ -26,13 +28,16 @@ export function FxCalendarGrid({ year, month, bookedDays = [], onSelectDay }: Fx
       ))}
       {cells.map((cell, i) => {
         if (cell.day === null) return <div key={`empty-${i}`} />
-        const isBooked = bookedDays.includes(cell.day)
-        const isToday = isCurrentMonth && today.getDate() === cell.day
+        const classes = ['fx-cal-day']
+        if (bookedDays.includes(cell.day)) classes.push('fx-cal-booked')
+        else if (partialDays.includes(cell.day)) classes.push('fx-cal-partial')
+        if (isCurrentMonth && today.getDate() === cell.day) classes.push('fx-cal-today')
+        if (selectedDay === cell.day) classes.push('fx-cal-selected')
         return (
           <button
             type="button"
             key={cell.day}
-            className={`fx-cal-day${isBooked ? ' fx-cal-booked' : ''}${isToday ? ' fx-cal-today' : ''}`}
+            className={classes.join(' ')}
             onClick={() => onSelectDay?.(cell.day as number)}
           >
             {cell.day}
