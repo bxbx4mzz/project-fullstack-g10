@@ -18,7 +18,7 @@ services:
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       STAFF_EMAILS: ${STAFF_EMAILS:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.8-flash}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
     volumes:
       - .:/app
       - maven-cache:/root/.m2
@@ -47,7 +47,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
