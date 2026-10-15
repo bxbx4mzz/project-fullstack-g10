@@ -1,0 +1,51 @@
+name: g10-pj
+
+services:
+  backend:
+    image: ${DOCKERHUB_USERNAME}/rental-backend:latest
+    container_name: g10-pj-backend
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rental
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      STAFF_EMAILS: ${STAFF_EMAILS:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/rental-frontend:latest
+    container_name: g10-pj-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      NGINX_PROXY: http://backend:8080
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:17
+    container_name: g10-pj-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: rental
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rental"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
