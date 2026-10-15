@@ -15,7 +15,7 @@ services:
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       STAFF_EMAILS: ${STAFF_EMAILS:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
     depends_on:
       postgres:
         condition: service_healthy
